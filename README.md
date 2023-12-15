@@ -40,7 +40,7 @@ int main()
 ```
 输出
 
-![指针](doc/ptr1.png)
+![指针](docs/ptr1.png)
 
 测试
 ```c++
@@ -61,7 +61,7 @@ int main()
     std::cout << magic::full_tree_of<T>() << std::endl;
 }
 ```
-![map](doc/map.png)
+![map](docs/map.png)
 
 ### 自定义类型名
 注意到上面在打印`std::string`的时候把它全部的内容都显示出来了，不好阅读，没关系，你可以通过自定义的特化来实现自定义类型名
@@ -82,7 +82,7 @@ int main()
 }
 ```
 输出
-![map](doc/string.png)，方便起见，我已经预定义了一些特化方便使用，如果你不想受到特化的影响，只想类型全部的内容，可以使用`magic::full_tree_of`。
+![map](docs/string.png)，方便起见，我已经预定义了一些特化方便使用，如果你不想受到特化的影响，只想类型全部的内容，可以使用`magic::full_tree_of`。
 
 ## 结构体反射
 包含`magic/struct.h`即可使用结构体下面这些功能
