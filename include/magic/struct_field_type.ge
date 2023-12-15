@@ -1,0 +1,130 @@
+else if constexpr (N == 1) 
+{
+    auto [a] = object;
+    return Id<std::tuple<decltype(a)>>{};
+}
+else if constexpr (N == 2) 
+{
+    auto [a, b] = object;
+    return Id<std::tuple<decltype(a), decltype(b)>>{};
+}
+else if constexpr (N == 3) 
+{
+    auto [a, b, c] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c)>>{};
+}
+else if constexpr (N == 4) 
+{
+    auto [a, b, c, d] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d)>>{};
+}
+else if constexpr (N == 5)
+{
+    auto [a, b, c, d, e] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e)>>{};
+}
+else if constexpr (N == 6)
+{
+    auto [a, b, c, d, e, f] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f)>>{};
+}
+else if constexpr (N == 7)
+{
+    auto [a, b, c, d, e, f, g] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g)>>{};
+}
+else if constexpr (N == 8)
+{
+    auto [a, b, c, d, e, f, g, h] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h)>>{};
+}
+else if constexpr (N == 9)
+{
+    auto [a, b, c, d, e, f, g, h, i] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i)>>{};     
+}
+else if constexpr (N == 10)
+{
+    auto [a, b, c, d, e, f, g, h, i, j] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j)>>{};
+}
+else if constexpr (N == 11)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k)>>{};
+}
+else if constexpr (N == 12)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l)>>{};
+}
+else if constexpr (N == 13)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m)>>{};
+}
+else if constexpr (N == 14)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m, n] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m), decltype(n)>>{};
+}
+else if constexpr (N == 15)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m), decltype(n), decltype(o)>>{};
+}
+else if constexpr (N == 16)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m), decltype(n), decltype(o), decltype(p)>>{};
+}
+else if constexpr (N == 17)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m), decltype(n), decltype(o), decltype(p), decltype(q)>>{};
+}
+else if constexpr (N == 18)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m), decltype(n), decltype(o), decltype(p), decltype(q), decltype(r)>>{};
+}
+else if constexpr (N == 19)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m), decltype(n), decltype(o), decltype(p), decltype(q), decltype(r), decltype(s)>>{};
+}
+else if constexpr (N == 20)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m), decltype(n), decltype(o), decltype(p), decltype(q), decltype(r), decltype(s), decltype(t)>>{};
+}
+else if constexpr (N == 21)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m), decltype(n), decltype(o), decltype(p), decltype(q), decltype(r), decltype(s), decltype(t), decltype(u)>>{};
+}
+else if constexpr (N == 22)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m), decltype(n), decltype(o), decltype(p), decltype(q), decltype(r), decltype(s), decltype(t), decltype(u), decltype(v)>>{};
+}
+else if constexpr (N == 23)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m), decltype(n), decltype(o), decltype(p), decltype(q), decltype(r), decltype(s), decltype(t), decltype(u), decltype(v), decltype(w)>>{};
+}
+else if constexpr (N == 24)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m), decltype(n), decltype(o), decltype(p), decltype(q), decltype(r), decltype(s), decltype(t), decltype(u), decltype(v), decltype(w), decltype(x)>>{};
+}
+else if constexpr (N == 25)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m), decltype(n), decltype(o), decltype(p), decltype(q), decltype(r), decltype(s), decltype(t), decltype(u), decltype(v), decltype(w), decltype(x), decltype(y)>>{};
+}
+else if constexpr (N == 26)
+{
+    auto [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z] = object;
+    return Id<std::tuple<decltype(a), decltype(b), decltype(c), decltype(d), decltype(e), decltype(f), decltype(g), decltype(h), decltype(i), decltype(j), decltype(k), decltype(l), decltype(m), decltype(n), decltype(o), decltype(p), decltype(q), decltype(r), decltype(s), decltype(t), decltype(u), decltype(v), decltype(w), decltype(x), decltype(y), decltype(z)>>{};
+}

@@ -1,0 +1,130 @@
+else if constexpr (N == 1) 
+{
+    auto&& [a] = object;
+    return std::get<Index> (std::forward_as_tuple(a));
+}
+else if constexpr (N == 2) 
+{
+    auto&& [a, b] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b));
+}
+else if constexpr (N == 3)
+{
+    auto&& [a, b, c] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c));
+}
+else if constexpr (N == 4)
+{
+    auto&& [a, b, c, d] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d));
+}
+else if constexpr (N == 5)
+{
+    auto&& [a, b, c, d, e] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e));
+}
+else if constexpr (N == 6)
+{
+    auto&& [a, b, c, d, e, f] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f));
+}
+else if constexpr (N == 7)
+{
+    auto&& [a, b, c, d, e, f, g] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g));
+}
+else if constexpr (N == 8)
+{
+    auto&& [a, b, c, d, e, f, g, h] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h));
+}
+else if constexpr (N == 9)
+{
+    auto&& [a, b, c, d, e, f, g, h, i] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i));
+}
+else if constexpr (N == 10)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j));
+}
+else if constexpr (N == 11)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k));
+}
+else if constexpr (N == 12)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l));
+}
+else if constexpr (N == 13)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m));
+}
+else if constexpr (N == 14)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n));
+}
+else if constexpr (N == 15)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o));
+}
+else if constexpr (N == 16)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p));
+}
+else if constexpr (N == 17)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q));
+}
+else if constexpr (N == 18)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r));
+}
+else if constexpr (N == 19)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s));
+}
+else if constexpr (N == 20)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t));
+}
+else if constexpr (N == 21)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u));
+}
+else if constexpr (N == 22)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v));
+}
+else if constexpr (N == 23)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w));
+}
+else if constexpr (N == 24)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x));
+}
+else if constexpr (N == 25)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y));
+}
+else if constexpr (N == 26)
+{
+    auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z] = object;
+    return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z));
+}

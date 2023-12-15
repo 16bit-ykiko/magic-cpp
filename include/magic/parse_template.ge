@@ -1,0 +1,231 @@
+    template <template <auto, typename> class T, auto T1, typename T2>
+    struct type_traits<T<T1, T2>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_NTTP(T1)
+        MAGIC_ADD_TYPE(T2)
+        MAGIC_PARSE_END
+    };
+
+    template <template <typename, auto> class T, typename T1, auto T2>
+    struct type_traits<T<T1, T2>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_TYPE(T1)
+        MAGIC_ADD_NTTP(T2)
+        MAGIC_PARSE_END
+    };
+
+    template <template <auto, typename, typename> class T, auto T1, typename T2, typename T3>
+    struct type_traits<T<T1, T2, T3>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_NTTP(T1)
+        MAGIC_ADD_TYPE(T2)
+        MAGIC_ADD_TYPE(T3)
+        MAGIC_PARSE_END
+    };
+
+    template <template <typename, auto, typename> class T, typename T1, auto T2, typename T3>
+    struct type_traits<T<T1, T2, T3>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_TYPE(T1)
+        MAGIC_ADD_NTTP(T2)
+        MAGIC_ADD_TYPE(T3)
+        MAGIC_PARSE_END
+    };
+
+    template <template <auto, auto, typename> class T, auto T1, auto T2, typename T3>
+    struct type_traits<T<T1, T2, T3>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_NTTP(T1)
+        MAGIC_ADD_NTTP(T2)
+        MAGIC_ADD_TYPE(T3)
+        MAGIC_PARSE_END
+    };
+
+    template <template <typename, typename, auto> class T, typename T1, typename T2, auto T3>
+    struct type_traits<T<T1, T2, T3>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_TYPE(T1)
+        MAGIC_ADD_TYPE(T2)
+        MAGIC_ADD_NTTP(T3)
+        MAGIC_PARSE_END
+    };
+
+    template <template <auto, typename, auto> class T, auto T1, typename T2, auto T3>
+    struct type_traits<T<T1, T2, T3>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_NTTP(T1)
+        MAGIC_ADD_TYPE(T2)
+        MAGIC_ADD_NTTP(T3)
+        MAGIC_PARSE_END
+    };
+
+    template <template <typename, auto, auto> class T, typename T1, auto T2, auto T3>
+    struct type_traits<T<T1, T2, T3>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_TYPE(T1)
+        MAGIC_ADD_NTTP(T2)
+        MAGIC_ADD_NTTP(T3)
+        MAGIC_PARSE_END
+    };
+
+    template <template <auto, typename, typename, typename> class T, auto T1, typename T2, typename T3, typename T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_NTTP(T1)
+        MAGIC_ADD_TYPE(T2)
+        MAGIC_ADD_TYPE(T3)
+        MAGIC_ADD_TYPE(T4)
+        MAGIC_PARSE_END
+    };
+
+    template <template <typename, auto, typename, typename> class T, typename T1, auto T2, typename T3, typename T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_TYPE(T1)
+        MAGIC_ADD_NTTP(T2)
+        MAGIC_ADD_TYPE(T3)
+        MAGIC_ADD_TYPE(T4)
+        MAGIC_PARSE_END
+    };
+
+    template <template <auto, auto, typename, typename> class T, auto T1, auto T2, typename T3, typename T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_NTTP(T1)
+        MAGIC_ADD_NTTP(T2)
+        MAGIC_ADD_TYPE(T3)
+        MAGIC_ADD_TYPE(T4)
+        MAGIC_PARSE_END
+    };
+
+    template <template <typename, typename, auto, typename> class T, typename T1, typename T2, auto T3, typename T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_TYPE(T1)
+        MAGIC_ADD_TYPE(T2)
+        MAGIC_ADD_NTTP(T3)
+        MAGIC_ADD_TYPE(T4)
+        MAGIC_PARSE_END
+    };
+
+    template <template <auto, typename, auto, typename> class T, auto T1, typename T2, auto T3, typename T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_NTTP(T1)
+        MAGIC_ADD_TYPE(T2)
+        MAGIC_ADD_NTTP(T3)
+        MAGIC_ADD_TYPE(T4)
+        MAGIC_PARSE_END
+    };
+
+    template <template <typename, auto, auto, typename> class T, typename T1, auto T2, auto T3, typename T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_TYPE(T1)
+        MAGIC_ADD_NTTP(T2)
+        MAGIC_ADD_NTTP(T3)
+        MAGIC_ADD_TYPE(T4)
+        MAGIC_PARSE_END
+    };
+
+    template <template <auto, auto, auto, typename> class T, auto T1, auto T2, auto T3, typename T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_NTTP(T1)
+        MAGIC_ADD_NTTP(T2)
+        MAGIC_ADD_NTTP(T3)
+        MAGIC_ADD_TYPE(T4)
+        MAGIC_PARSE_END
+    };
+
+    template <template <typename, typename, typename, auto> class T, typename T1, typename T2, typename T3, auto T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_TYPE(T1)
+        MAGIC_ADD_TYPE(T2)
+        MAGIC_ADD_TYPE(T3)
+        MAGIC_ADD_NTTP(T4)
+        MAGIC_PARSE_END
+    };
+
+    template <template <auto, typename, typename, auto> class T, auto T1, typename T2, typename T3, auto T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_NTTP(T1)
+        MAGIC_ADD_TYPE(T2)
+        MAGIC_ADD_TYPE(T3)
+        MAGIC_ADD_NTTP(T4)
+        MAGIC_PARSE_END
+    };
+
+    template <template <typename, auto, typename, auto> class T, typename T1, auto T2, typename T3, auto T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_TYPE(T1)
+        MAGIC_ADD_NTTP(T2)
+        MAGIC_ADD_TYPE(T3)
+        MAGIC_ADD_NTTP(T4)
+        MAGIC_PARSE_END
+    };
+
+    template <template <auto, auto, typename, auto> class T, auto T1, auto T2, typename T3, auto T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_NTTP(T1)
+        MAGIC_ADD_NTTP(T2)
+        MAGIC_ADD_TYPE(T3)
+        MAGIC_ADD_NTTP(T4)
+        MAGIC_PARSE_END
+    };
+
+    template <template <typename, typename, auto, auto> class T, typename T1, typename T2, auto T3, auto T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_TYPE(T1)
+        MAGIC_ADD_TYPE(T2)
+        MAGIC_ADD_NTTP(T3)
+        MAGIC_ADD_NTTP(T4)
+        MAGIC_PARSE_END
+    };
+
+    template <template <auto, typename, auto, auto> class T, auto T1, typename T2, auto T3, auto T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_NTTP(T1)
+        MAGIC_ADD_TYPE(T2)
+        MAGIC_ADD_NTTP(T3)
+        MAGIC_ADD_NTTP(T4)
+        MAGIC_PARSE_END
+    };
+
+    template <template <typename, auto, auto, auto> class T, typename T1, auto T2, auto T3, auto T4>
+    struct type_traits<T<T1, T2, T3, T4>>
+    {
+        MAGIC_PARSE_START
+        MAGIC_ADD_TYPE(T1)
+        MAGIC_ADD_NTTP(T2)
+        MAGIC_ADD_NTTP(T3)
+        MAGIC_ADD_NTTP(T4)
+        MAGIC_PARSE_END
+    };
