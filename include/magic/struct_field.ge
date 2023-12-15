@@ -1,3 +1,7 @@
+if constexpr (N == 0)
+{
+    static_assert(N != 0, "the object has no fields");
+}
 else if constexpr (N == 1) 
 {
     auto&& [a] = object;
@@ -127,4 +131,8 @@ else if constexpr (N == 26)
 {
     auto&& [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z] = object;
     return std::get<Index> (std::forward_as_tuple(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z));
+}
+else
+{
+    static_assert(N <= 26, "the max of supported fields is 26");
 }

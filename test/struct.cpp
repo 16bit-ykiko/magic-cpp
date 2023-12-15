@@ -6,11 +6,85 @@
 
 using namespace magic;
 
+/**
+ * the most important thing is test the precision of the field_num_of
+ */
+#define FIELD_NUM_EQUAL(T, N) static_assert(field_num_of<T>() == N)
+
 struct Point
 {
     int x;
     int y;
 };
+
+struct A
+{
+    Point a;
+};
+
+FIELD_NUM_EQUAL(A, 1);
+
+struct B
+{
+    Point& a;
+};
+
+FIELD_NUM_EQUAL(B, 1);
+
+struct C
+{
+    Point a[2];
+};
+
+FIELD_NUM_EQUAL(C, 1);
+
+struct D
+{
+    Point a[2][3];
+};
+
+FIELD_NUM_EQUAL(D, 1);
+
+struct E
+{
+    Point a[2];
+    Point b[2][2];
+};
+FIELD_NUM_EQUAL(E, 2);
+
+struct F
+{
+    Point a[2];
+    Point b[2][2];
+    Point& c;
+};
+
+FIELD_NUM_EQUAL(F, 3);
+
+struct G
+{
+    Point a[2];
+    Point b[2][2];
+    Point& c;
+    Point d[2];
+};
+
+FIELD_NUM_EQUAL(G, 4);
+
+struct H
+{
+    Point a[2];
+    Point b[2][2];
+    Point c;
+    Point d[2];
+    Point& e;
+};
+
+FIELD_NUM_EQUAL(H, 5);
+
+/**
+ * test for other functions
+ */
 
 static_assert(field_num_of<Point>() == 2);
 
@@ -25,23 +99,6 @@ static_assert(field_name_of<Point>(1) == "y");
 constexpr auto point = Point{1, 2};
 static_assert(field_of<0>(point) == 1);
 static_assert(field_of<1>(point) == 2);
-
-void test_for_point()
-{
-    Point point = {1, 2};
-    auto f = [](auto name, auto&& field)
-    {
-        if (name == "x")
-        {
-            assert(field == 1);
-        }
-        else if (name == "y")
-        {
-            assert(field == 2);
-        }
-    };
-    magic::foreach (point, f);
-}
 
 struct Container
 {
@@ -64,33 +121,33 @@ static_assert(field_name_of<Container>(2) == "vec");
 
 void test_for_container()
 {
-    Container container = {
+    auto container = Container{
         {1, 2},
         {3, 4, 5},
-        {6, 7, 8}
+        {6, 7, 8},
     };
-    auto f = [](auto name, auto&& field)
+    auto f = [](auto field)
     {
-        using T = std::remove_cvref_t<decltype(field)>;
-        if constexpr (std::is_same_v<T, Point>)
+        constexpr auto name = field.name();
+        if constexpr (name == "point")
         {
-            assert(field.x == 1);
-            assert(field.y == 2);
+            assert(field.value().x == 1);
+            assert(field.value().y == 2);
         }
-        else if constexpr (std::is_same_v<T, int[3]>)
+        else if constexpr (name == "array")
         {
-            assert(field[0] == 3);
-            assert(field[1] == 4);
-            assert(field[2] == 5);
+            assert(field.value()[0] == 3);
+            assert(field.value()[1] == 4);
+            assert(field.value()[2] == 5);
         }
-        else if constexpr (std::is_same_v<T, std::vector<int>>)
+        else if constexpr (name == "vec")
         {
-            assert(field[0] == 6);
-            assert(field[1] == 7);
-            assert(field[2] == 8);
+            assert(field.value()[0] == 6);
+            assert(field.value()[1] == 7);
+            assert(field.value()[2] == 8);
         }
     };
-    magic::foreach (container, f);
+    foreach(container, f);
 }
 
 // gcc 13 ice, so cannot get the fields number of struct which has reference type member in gcc 13
@@ -125,18 +182,10 @@ static_assert(field_of<2>(ref)[0] == 2);
 static_assert(field_of<2>(ref)[1] == 3);
 static_assert(field_of<3>(ref) == 4);
 
-struct Complex
-{
-    int x;
-    std::string ss;
-    int arr[3];
-    std::vector<int> vec;
-    int& a;
-};
+using namespace magic::details;
 
 int main()
 {
-    test_for_point();
     test_for_container();
     std::cout << "All tests passed" << std::endl;
     system("pause");
