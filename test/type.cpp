@@ -1,29 +1,22 @@
 #include <iostream>
 #include <magic/type.h>
 #include <map>
+#include <string>
 #include <vector>
 
-namespace magic
-{
-    template <>
-    struct type_info<std::string>
-    {
-        constexpr static auto name = "std::string";
-    };
-} // namespace magic
+using namespace magic;
 
-struct A
+struct Point
 {
-    int x;
-    void f(int) {}
 };
 
-int main()
+static_assert(name_of<std::string>() == "std::string");
+static_assert(name_of<const std::string&>() == "const std::string&");
+static_assert(name_of<std::size_t>() == "std::size_t");
+static_assert(name_of<std::vector<int>>() == "std::vector<int>");
+static_assert(name_of<Point>() == "Point");
+
+int main() 
 {
-    auto m = &A::f;
-    using T = int (*(*(*)(int*))[4])(int*);
-    std::cout << magic::tree_of<T>() << std::endl;
-    std::cout << magic::tree_of<const std::string&>() << std::endl;
-    std::cout << magic::tree_of<std::map<int, std::string>>() << std::endl;
-    system("pause");
+    
 }

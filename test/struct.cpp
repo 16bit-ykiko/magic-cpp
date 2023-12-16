@@ -7,9 +7,9 @@
 using namespace magic;
 
 /**
- * the most important thing is test the precision of the field_num_of
+ * the most important thing is test the precision of the field_count_of
  */
-#define FIELD_NUM_EQUAL(T, N) static_assert(field_num_of<T>() == N)
+#define FIELD_COUNT_EQUAL(T, N) static_assert(field_count_of<T>() == N)
 
 struct Point
 {
@@ -22,35 +22,35 @@ struct A
     Point a;
 };
 
-FIELD_NUM_EQUAL(A, 1);
+FIELD_COUNT_EQUAL(A, 1);
 
 struct B
 {
     Point& a;
 };
 
-FIELD_NUM_EQUAL(B, 1);
+FIELD_COUNT_EQUAL(B, 1);
 
 struct C
 {
     Point a[2];
 };
 
-FIELD_NUM_EQUAL(C, 1);
+FIELD_COUNT_EQUAL(C, 1);
 
 struct D
 {
     Point a[2][3];
 };
 
-FIELD_NUM_EQUAL(D, 1);
+FIELD_COUNT_EQUAL(D, 1);
 
 struct E
 {
     Point a[2];
     Point b[2][2];
 };
-FIELD_NUM_EQUAL(E, 2);
+FIELD_COUNT_EQUAL(E, 2);
 
 struct F
 {
@@ -59,7 +59,7 @@ struct F
     Point& c;
 };
 
-FIELD_NUM_EQUAL(F, 3);
+FIELD_COUNT_EQUAL(F, 3);
 
 struct G
 {
@@ -69,7 +69,7 @@ struct G
     Point d[2];
 };
 
-FIELD_NUM_EQUAL(G, 4);
+FIELD_COUNT_EQUAL(G, 4);
 
 struct H
 {
@@ -80,13 +80,13 @@ struct H
     Point& e;
 };
 
-FIELD_NUM_EQUAL(H, 5);
+FIELD_COUNT_EQUAL(H, 5);
 
 /**
  * test for other functions
  */
 
-static_assert(field_num_of<Point>() == 2);
+static_assert(field_count_of<Point>() == 2);
 
 static_assert(std::is_same_v<field_types_of<Point>, std::tuple<int, int>>);
 static_assert(std::is_same_v<field_type_of<Point, 0>, int>);
@@ -107,7 +107,7 @@ struct Container
     std::vector<int> vec;
 };
 
-static_assert(field_num_of<Container>() == 3);
+static_assert(field_count_of<Container>() == 3);
 
 static_assert(std::is_same_v<field_types_of<Container>, std::tuple<Point, int[3], std::vector<int>>>);
 static_assert(std::is_same_v<field_type_of<Container, 0>, Point>);
@@ -147,10 +147,12 @@ void test_for_container()
             assert(field.value()[2] == 8);
         }
     };
-    foreach(container, f);
+    foreach (container, f)
+        ;
 }
 
-// gcc 13 ice, so cannot get the fields number of struct which has reference type member in gcc 13
+// gcc 13 ice, so cannot get the fields number of struct which has reference
+// type member in gcc 13
 struct Reference
 {
     int x;
@@ -159,7 +161,7 @@ struct Reference
     int y;
 };
 
-static_assert(field_num_of<Reference>() == 4);
+static_assert(field_count_of<Reference>() == 4);
 static_assert(std::is_same_v<field_types_of<Reference>, std::tuple<int, const int&, int[2], int>>);
 static_assert(std::is_same_v<field_type_of<Reference, 0>, int>);
 static_assert(std::is_same_v<field_type_of<Reference, 1>, const int&>);

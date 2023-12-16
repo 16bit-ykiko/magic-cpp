@@ -7,6 +7,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(include) 
 
+add_executable(main test/main.cpp)
+
 add_executable(struct test/struct.cpp)
 
 add_executable(type test/type.cpp)

@@ -221,7 +221,8 @@ namespace magic::details
         else if constexpr (std::is_function_v<T>)
         {
             auto modifier = GetFunctionModifier<T>();
-            return type_traits<T>::parse(modifier, is_full_name);
+            using F = typename function_traits<T>::type;
+            return type_traits<F>::parse(modifier, is_full_name);
         }
         else if constexpr (requires { type_traits<std::remove_cv_t<T>>::parse; })
         {

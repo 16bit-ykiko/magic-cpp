@@ -6,7 +6,6 @@
 #include <tuple>
 #include <type_traits>
 
-
 // gcc 13 ice
 // msvc bug
 // namespace magic::details
@@ -30,7 +29,7 @@ namespace magic::details
     }
 
     template <typename T, std::size_t N = 0>
-    consteval std::size_t total_number_of_fields()
+    consteval std::size_t total_count_of_fields()
     {
         if constexpr (try_initialize_with_n<T>(std::make_index_sequence<N>{}))
         {
@@ -38,14 +37,14 @@ namespace magic::details
         }
         else
         {
-            return total_number_of_fields<T, N + 1>();
+            return total_count_of_fields<T, N + 1>();
         }
     }
 
     template <typename T, std::size_t position, std::size_t N>
     constexpr auto try_place_n_in_pos()
     {
-        constexpr auto Total = total_number_of_fields<T>();
+        constexpr auto Total = total_count_of_fields<T>();
         if constexpr (N == 0)
         {
             return true;
@@ -76,7 +75,7 @@ namespace magic::details
     template <typename T, std::size_t N = 0>
     constexpr auto search_extra_index(auto&& array)
     {
-        constexpr auto total = total_number_of_fields<T>();
+        constexpr auto total = total_count_of_fields<T>();
         constexpr auto value = std::max(search_max_in_pos<T, N, total>(), static_cast<std::size_t>(1));
         array[N] = value;
         if constexpr (N + value < total)
@@ -86,9 +85,9 @@ namespace magic::details
     }
 
     template <typename T>
-    constexpr auto true_number_of_fields()
+    constexpr auto true_count_of_fields()
     {
-        constexpr auto max = total_number_of_fields<T>();
+        constexpr auto max = total_count_of_fields<T>();
         std::array<std::size_t, max> indices = {1};
         search_extra_index<T>(indices);
         std::size_t result = max;
@@ -104,9 +103,12 @@ namespace magic::details
 } // namespace magic::details
 namespace magic
 {
+    template <typename T>
+    struct type_info;
+
     /**
-     *  @brief Retrieve the number of fields of a struct
-     *  @warning cannot get the number of fields of a struct which has reference
+     *  @brief Retrieve the count of fields of a struct
+     *  @warning cannot get the count of fields of a struct which has reference
      * type member in gcc 13 because the internal error occurs in below occasion
      *  @code
      *  struct Number { operator int&(); };
@@ -118,13 +120,22 @@ namespace magic
      */
     template <typename T>
     requires std::is_aggregate_v<T>
-    consteval auto field_num_of()
+    consteval auto field_count_of()
     {
-#if _MSC_VER && !__clang__
-        return details::total_number_of_fields<T>();
-#else
-        return details::true_number_of_fields<T>();
-#endif
+        if constexpr (requires { type_info<T>::count; })
+        {
+            return type_info<T>::count;
+        }
+        else
+        {
+// clang-format off
+            #if _MSC_VER && !__clang__
+                return details::total_count_of_fields<T>();
+            #else
+                return details::true_count_of_fields<T>();
+            #endif
+            // clang-format on
+        }
     }
 } // namespace magic
 
@@ -133,8 +144,8 @@ namespace magic::details
     template <typename T>
     constexpr auto field_types_of_impl(T object)
     {
-        constexpr auto N = field_num_of<T>();
-        // clang-format off
+        constexpr auto N = field_count_of<T>();
+// clang-format off
         #include "struct_field_type.ge"
         // clang-format on
     }
@@ -143,8 +154,8 @@ namespace magic::details
     constexpr auto&& field_of_impl(auto&& object)
     {
         using T = std::remove_cvref_t<decltype(object)>;
-        constexpr auto N = field_num_of<T>();
-        // clang-format off
+        constexpr auto N = field_count_of<T>();
+// clang-format off
         #include "struct_field.ge"
         // clang-format on
     }
@@ -228,7 +239,7 @@ namespace magic::details
     template <typename T>
     constexpr auto field_names_of_impl()
     {
-        constexpr auto N = field_num_of<T>();
+        constexpr auto N = field_count_of<T>();
         std::array<std::string_view, N> names{};
 
         [&]<std::size_t... Is>(std::index_sequence<Is...>)
@@ -289,7 +300,7 @@ namespace magic
                       "T must be an aggregate type and default constructible");
 
         [&]<std::size_t... Is>(std::index_sequence<Is...>)
-        { (functor(Field<Is, Object>{std::forward<Object>(object)}), ...); }(std::make_index_sequence<field_num_of<T>()>{});
+        { (functor(Field<Is, Object>{std::forward<Object>(object)}), ...); }(std::make_index_sequence<field_count_of<T>()>{});
     }
 } // namespace magic
 
