@@ -184,7 +184,7 @@ namespace magic::details
             auto name = String("function").coloring(BUILTIN_COLOR);
             auto modifier = String(function->modifier).coloring(MODIFIER_COLOR);
             result += format("{}{} {}\n", branch, name, modifier);
-            tree_of_impl(function->return_type, result, new_prefix, false, "R: ");
+            tree_of_impl(function->return_type, result, new_prefix, function->parameters.size() == 0, "R: ");
             for (std::size_t index = 0; index < function->parameters.size(); index++)
             {
                 String id = String::from(index) + ": ";

@@ -128,7 +128,7 @@ namespace magic
         }
         else
         {
-// clang-format off
+            // clang-format off
             #if _MSC_VER && !__clang__
                 return details::total_count_of_fields<T>();
             #else
@@ -145,7 +145,7 @@ namespace magic::details
     constexpr auto field_types_of_impl(T object)
     {
         constexpr auto N = field_count_of<T>();
-// clang-format off
+        // clang-format off
         #include "struct_field_type.ge"
         // clang-format on
     }
@@ -155,7 +155,7 @@ namespace magic::details
     {
         using T = std::remove_cvref_t<decltype(object)>;
         constexpr auto N = field_count_of<T>();
-// clang-format off
+        // clang-format off
         #include "struct_field.ge"
         // clang-format on
     }
