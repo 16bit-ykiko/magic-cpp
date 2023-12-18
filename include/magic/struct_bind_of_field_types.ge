@@ -1,0 +1,169 @@
+
+if constexpr (N == 0)
+{
+    return std::type_identity<std::tuple<>>{};
+}
+else if constexpr (N == 1) 
+{
+    auto [v0] = object;
+    return std::type_identity<std::tuple<decltype(v0)>>{};
+}
+else if constexpr (N == 2) 
+{
+    auto [v0, v1] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1)>>{};
+}
+else if constexpr (N == 3) 
+{
+    auto [v0, v1, v2] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2)>>{};
+}
+else if constexpr (N == 4) 
+{
+    auto [v0, v1, v2, v3] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3)>>{};
+}
+else if constexpr (N == 5) 
+{
+    auto [v0, v1, v2, v3, v4] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4)>>{};
+}
+else if constexpr (N == 6) 
+{
+    auto [v0, v1, v2, v3, v4, v5] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5)>>{};
+}
+else if constexpr (N == 7) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6)>>{};
+}
+else if constexpr (N == 8) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7)>>{};
+}
+else if constexpr (N == 9) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8)>>{};
+}
+else if constexpr (N == 10) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9)>>{};
+}
+else if constexpr (N == 11) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10)>>{};
+}
+else if constexpr (N == 12) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11)>>{};
+}
+else if constexpr (N == 13) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12)>>{};
+}
+else if constexpr (N == 14) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13)>>{};
+}
+else if constexpr (N == 15) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14)>>{};
+}
+else if constexpr (N == 16) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15)>>{};
+}
+else if constexpr (N == 17) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16)>>{};
+}
+else if constexpr (N == 18) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17)>>{};
+}
+else if constexpr (N == 19) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18)>>{};
+}
+else if constexpr (N == 20) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18), decltype(v19)>>{};
+}
+else if constexpr (N == 21) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18), decltype(v19), decltype(v20)>>{};
+}
+else if constexpr (N == 22) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18), decltype(v19), decltype(v20), decltype(v21)>>{};
+}
+else if constexpr (N == 23) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18), decltype(v19), decltype(v20), decltype(v21), decltype(v22)>>{};
+}
+else if constexpr (N == 24) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18), decltype(v19), decltype(v20), decltype(v21), decltype(v22), decltype(v23)>>{};
+}
+else if constexpr (N == 25) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18), decltype(v19), decltype(v20), decltype(v21), decltype(v22), decltype(v23), decltype(v24)>>{};
+}
+else if constexpr (N == 26) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18), decltype(v19), decltype(v20), decltype(v21), decltype(v22), decltype(v23), decltype(v24), decltype(v25)>>{};
+}
+else if constexpr (N == 27) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18), decltype(v19), decltype(v20), decltype(v21), decltype(v22), decltype(v23), decltype(v24), decltype(v25), decltype(v26)>>{};
+}
+else if constexpr (N == 28) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18), decltype(v19), decltype(v20), decltype(v21), decltype(v22), decltype(v23), decltype(v24), decltype(v25), decltype(v26), decltype(v27)>>{};
+}
+else if constexpr (N == 29) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18), decltype(v19), decltype(v20), decltype(v21), decltype(v22), decltype(v23), decltype(v24), decltype(v25), decltype(v26), decltype(v27), decltype(v28)>>{};
+}
+else if constexpr (N == 30) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18), decltype(v19), decltype(v20), decltype(v21), decltype(v22), decltype(v23), decltype(v24), decltype(v25), decltype(v26), decltype(v27), decltype(v28), decltype(v29)>>{};
+}
+else if constexpr (N == 31) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18), decltype(v19), decltype(v20), decltype(v21), decltype(v22), decltype(v23), decltype(v24), decltype(v25), decltype(v26), decltype(v27), decltype(v28), decltype(v29), decltype(v30)>>{};
+}
+else if constexpr (N == 32) 
+{
+    auto [v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24, v25, v26, v27, v28, v29, v30, v31] = object;
+    return std::type_identity<std::tuple<decltype(v0), decltype(v1), decltype(v2), decltype(v3), decltype(v4), decltype(v5), decltype(v6), decltype(v7), decltype(v8), decltype(v9), decltype(v10), decltype(v11), decltype(v12), decltype(v13), decltype(v14), decltype(v15), decltype(v16), decltype(v17), decltype(v18), decltype(v19), decltype(v20), decltype(v21), decltype(v22), decltype(v23), decltype(v24), decltype(v25), decltype(v26), decltype(v27), decltype(v28), decltype(v29), decltype(v30), decltype(v31)>>{};
+}
+else
+{
+    static_assert(N <= 32, "the max of supported fields is 32");
+}

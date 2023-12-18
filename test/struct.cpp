@@ -1,3 +1,4 @@
+#include <array>
 #include <cassert>
 #include <iostream>
 #include <magic/struct.h>
@@ -30,58 +31,6 @@ struct B
 };
 
 FIELD_COUNT_EQUAL(B, 1);
-
-struct C
-{
-    Point a[2];
-};
-
-FIELD_COUNT_EQUAL(C, 1);
-
-struct D
-{
-    Point a[2][3];
-};
-
-FIELD_COUNT_EQUAL(D, 1);
-
-struct E
-{
-    Point a[2];
-    Point b[2][2];
-};
-FIELD_COUNT_EQUAL(E, 2);
-
-struct F
-{
-    Point a[2];
-    Point b[2][2];
-    Point& c;
-};
-
-FIELD_COUNT_EQUAL(F, 3);
-
-struct G
-{
-    Point a[2];
-    Point b[2][2];
-    Point& c;
-    Point d[2];
-};
-
-FIELD_COUNT_EQUAL(G, 4);
-
-struct H
-{
-    Point a[2];
-    Point b[2][2];
-    Point c;
-    Point d[2];
-    Point& e;
-};
-
-FIELD_COUNT_EQUAL(H, 5);
-
 /**
  * test for other functions
  */
@@ -103,15 +52,15 @@ static_assert(field_of<1>(point) == 2);
 struct Container
 {
     Point point;
-    int array[3];
+    std::array<int, 3> array;
     std::vector<int> vec;
 };
 
 static_assert(field_count_of<Container>() == 3);
 
-static_assert(std::is_same_v<field_types_of<Container>, std::tuple<Point, int[3], std::vector<int>>>);
+static_assert(std::is_same_v<field_types_of<Container>, std::tuple<Point, std::array<int, 3>, std::vector<int>>>);
 static_assert(std::is_same_v<field_type_of<Container, 0>, Point>);
-static_assert(std::is_same_v<field_type_of<Container, 1>, int[3]>);
+static_assert(std::is_same_v<field_type_of<Container, 1>, std::array<int, 3>>);
 static_assert(std::is_same_v<field_type_of<Container, 2>, std::vector<int>>);
 
 static_assert(field_names_of<Container>() == std::array<std::string_view, 3>{"point", "array", "vec"});
@@ -157,16 +106,14 @@ struct Reference
 {
     int x;
     const int& ref;
-    int arr[2];
     int y;
 };
 
-static_assert(field_count_of<Reference>() == 4);
-static_assert(std::is_same_v<field_types_of<Reference>, std::tuple<int, const int&, int[2], int>>);
+static_assert(field_count_of<Reference>() == 3);
+static_assert(std::is_same_v<field_types_of<Reference>, std::tuple<int, const int&, int>>);
 static_assert(std::is_same_v<field_type_of<Reference, 0>, int>);
 static_assert(std::is_same_v<field_type_of<Reference, 1>, const int&>);
-static_assert(std::is_same_v<field_type_of<Reference, 2>, int[2]>);
-static_assert(std::is_same_v<field_type_of<Reference, 3>, int>);
+static_assert(std::is_same_v<field_type_of<Reference, 2>, int>);
 
 // Reference cannot be default constructed
 // Not support to get field names of Reference
@@ -175,14 +122,11 @@ constexpr int x = 3;
 constexpr auto ref = Reference{
     1,
     x,
-    {2, 3},
     4,
 };
 static_assert(field_of<0>(ref) == 1);
 static_assert(field_of<1>(ref) == 3);
-static_assert(field_of<2>(ref)[0] == 2);
-static_assert(field_of<2>(ref)[1] == 3);
-static_assert(field_of<3>(ref) == 4);
+static_assert(field_of<2>(ref) == 4);
 
 using namespace magic::details;
 

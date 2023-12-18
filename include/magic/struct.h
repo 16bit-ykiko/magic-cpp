@@ -31,6 +31,11 @@ namespace magic::details
     template <typename T, std::size_t N = 0>
     consteval std::size_t total_count_of_fields()
     {
+        if constexpr (N > sizeof(T) * 8 + 1)
+        {
+            static_assert(N <= sizeof(T) * 8 + 1, "Unexpected Error in count fields");
+        }
+
         if constexpr (try_initialize_with_n<T>(std::make_index_sequence<N>{}))
         {
             return N;
@@ -63,12 +68,13 @@ namespace magic::details
         }
     }
 
-    template <typename T, std::size_t pos, std::size_t Total>
+    template <typename T, std::size_t pos>
     constexpr auto search_max_in_pos()
     {
+        constexpr auto Total = total_count_of_fields<T>();
         std::size_t result = 0;
         [&]<std::size_t... Is>(std::index_sequence<Is...>)
-        { ((try_place_n_in_pos<T, pos, Is>() > result ? result = Is : 0), ...); }(std::make_index_sequence<Total + 1>());
+        { ((try_place_n_in_pos<T, pos, Is>() && !result ? result = Is : 0), ...); }(std::make_index_sequence<Total + 1>());
         return result;
     }
 
@@ -76,7 +82,7 @@ namespace magic::details
     constexpr auto search_extra_index(auto&& array)
     {
         constexpr auto total = total_count_of_fields<T>();
-        constexpr auto value = std::max(search_max_in_pos<T, N, total>(), static_cast<std::size_t>(1));
+        constexpr auto value = std::max(search_max_in_pos<T, N>(), static_cast<std::size_t>(1));
         array[N] = value;
         if constexpr (N + value < total)
         {
@@ -128,13 +134,7 @@ namespace magic
         }
         else
         {
-            // clang-format off
-            #if _MSC_VER && !__clang__
-                return details::total_count_of_fields<T>();
-            #else
-                return details::true_count_of_fields<T>();
-            #endif
-            // clang-format on
+            return details::total_count_of_fields<T>();
         }
     }
 } // namespace magic
@@ -146,7 +146,7 @@ namespace magic::details
     {
         constexpr auto N = field_count_of<T>();
         // clang-format off
-        #include "struct_field_type.ge"
+        #include "struct_bind_of_field_types.ge"
         // clang-format on
     }
 
@@ -156,7 +156,7 @@ namespace magic::details
         using T = std::remove_cvref_t<decltype(object)>;
         constexpr auto N = field_count_of<T>();
         // clang-format off
-        #include "struct_field.ge"
+        #include "struct_bind_of_field_access.ge"
         // clang-format on
     }
 } // namespace magic::details

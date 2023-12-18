@@ -2,6 +2,7 @@
 #include <magic/type.h>
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 using namespace magic;
@@ -18,5 +19,6 @@ static_assert(name_of<Point>() == "Point");
 
 int main() 
 {
-    
+    std::cout << tree_of<std::make_index_sequence<10>>() << std::endl;
+    std::cout << tree_of<std::map<int, std::string>>() << std::endl;
 }

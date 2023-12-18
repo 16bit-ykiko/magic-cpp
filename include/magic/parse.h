@@ -2,9 +2,49 @@
 #define MAGIC_CPP_MAGIC_PARSE_H
 
 #include "function_traits.h"
-#include "raw_name.h"
+#include <string_view>
 #include <vector>
 
+
+#if __clang__ || __GNUC__
+#define METAINFO                                                                                                                           \
+    std::string_view name = __PRETTY_FUNCTION__;                                                                                           \
+    std::size_t first = name.find("T =") + 4;                                                                                              \
+    std::size_t last = name.rfind("]");                                                                                                    \
+    return name.substr(first, last - first);
+
+#elif _MSC_VER
+#define METAINFO                                                                                                                           \
+    std::string_view name = __FUNCSIG__;                                                                                                   \
+    std::string_view prefix = "name_of<class ";                                                                                            \
+    std::size_t last = name.rfind(">(");                                                                                                   \
+    std::size_t first = name.find(prefix);                                                                                                 \
+    if (first == std::string_view::npos)                                                                                                   \
+    {                                                                                                                                      \
+        prefix = "name_of<struct ";                                                                                                        \
+        first = name.find(prefix);                                                                                                         \
+    }                                                                                                                                      \
+    if (first == std::string_view::npos)                                                                                                   \
+    {                                                                                                                                      \
+        prefix = "name_of<";                                                                                                               \
+        first = name.find(prefix);                                                                                                         \
+    }                                                                                                                                      \
+    first += prefix.size();                                                                                                                \
+    return name.substr(first, last - first);
+
+#else
+static_assert(false, "Unsupported compiler");
+#endif
+
+namespace magic::details
+{
+    template <typename T>
+    constexpr auto raw_name_of(){METAINFO};
+
+    template <auto T>
+    constexpr auto raw_name_of(){METAINFO};
+} // namespace magic::details
+#undef METAINFO
 namespace magic
 {
     template <typename T>
@@ -242,7 +282,6 @@ namespace magic::details
 
 namespace magic::details
 {
-
     template <typename R, typename... Args>
     struct type_traits<R(Args...)>
     {
@@ -267,39 +306,6 @@ namespace magic::details
             return result;
         }
     };
-
-    template <template <typename...> class T, typename... Args>
-    struct type_traits<T<Args...>>
-    {
-        constexpr static Type* parse(std::string_view modifier, bool is_full_name)
-        {
-            Template* result = new Template;
-            result->name = magic::details::raw_name_of<T>();
-            result->modifier = modifier;
-            ([&]<typename P> { result->parameters.push_back(magic::details::parse<P>(is_full_name)); }.template operator()<Args>(), ...);
-            return result;
-        }
-    };
-
-    template <template <auto...> class T, auto... Args>
-    struct type_traits<T<Args...>>
-    {
-        constexpr static Type* parse(std::string_view modifier, bool is_full_name)
-        {
-            Template* result = new Template;
-            result->name = magic::details::raw_name_of<T>();
-            result->modifier = modifier;
-            (
-                [&]<auto P>
-                {
-                    NTTP* nttp = new NTTP;
-                    nttp->name = magic::details::raw_name_of<P>();
-                    result->parameters.push_back(nttp);
-                }.template operator()<Args>(),
-                ...);
-            return result;
-        }
-    };
 } // namespace magic::details
 
 /**
@@ -314,7 +320,7 @@ namespace magic::details
     constexpr static Type* parse(std::string_view modifier, bool is_full_name)                                                             \
     {                                                                                                                                      \
         Template* result = new Template;                                                                                                   \
-        result->name = magic::details::raw_name_of<T>();                                                                                   \
+        result->name = name;                                                                                                               \
         result->modifier = modifier;
 
 #define MAGIC_PARSE_END                                                                                                                    \
@@ -328,12 +334,55 @@ namespace magic::details
     nttp##T->name = magic::details::raw_name_of<T>();                                                                                      \
     result->parameters.push_back(nttp##T);
 
+#define MAGIC_ADD_VARADIC_TYPES(Ts)                                                                                                        \
+    ([&]<typename TYPE> { result->parameters.push_back(magic::details::parse<TYPE>(is_full_name)); }.template operator()<Ts>(), ...);
+
+#define MAGIC_ADD_VARADIC_NTTPS(Ts)                                                                                                        \
+    (                                                                                                                                      \
+        [&]<auto VALUE>                                                                                                                    \
+        {                                                                                                                                  \
+            NTTP* nttps = new NTTP();                                                                                                      \
+            nttps->name = magic::details::raw_name_of<VALUE>();                                                                            \
+            result->parameters.push_back(nttps);                                                                                           \
+        }.template operator()<Ts>(),                                                                                                       \
+        ...);
+#if __clang__ || __GNUC__
+#define MAGIC_TEMPLATE_NAME                                                                                                                \
+    constexpr static std::string_view name = []                                                                                            \
+    {                                                                                                                                      \
+        std::string_view name = __PRETTY_FUNCTION__;                                                                                       \
+        auto first = name.find("type_traits<") + 12;                                                                                       \
+        auto end = first;                                                                                                                  \
+        for (; end < name.size() && name[end] != '<'; ++end) {}                                                                            \
+        return name.substr(first, end - first);                                                                                            \
+    }();
+#elif _MSC_VER
+#define MAGIC_TEMPLATE_NAME                                                                                                                \
+    constexpr static auto name = []                                                                                                        \
+    {                                                                                                                                      \
+        std::string_view name = __FUNCSIG__;                                                                                               \
+        auto first = name.find("type_traits<class ") + 18;                                                                                 \
+        if (name.find("type_traits<class ") == std::string_view::npos)                                                                     \
+        {                                                                                                                                  \
+            first = name.find("type_traits<struct") + 19;                                                                                  \
+        }                                                                                                                                  \
+        auto end = first;                                                                                                                  \
+        for (; end < name.size() && name[end] != '<'; ++end) {}                                                                            \
+        return name.substr(first, end - first);                                                                                            \
+    }();
+#else
+    static_assert(false, "Not supported compiler");
+#endif
+
 #include "parse_template.ge"
 
 #undef MAGIC_PARSE_START
 #undef MAGIC_PARSE_END
 #undef MAGIC_ADD_TYPE
 #undef MAGIC_ADD_NTTP
+#undef MAGIC_ADD_VARADIC_TYPES
+#undef MAGIC_ADD_VARADIC_NTTPS
+#undef MAGIC_TEMPLATE_NAME
 } // namespace magic::details
 
 #endif
