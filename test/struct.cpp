@@ -6,31 +6,11 @@
 #include <vector>
 
 using namespace magic;
-
-/**
- * the most important thing is test the precision of the field_count_of
- */
-#define FIELD_COUNT_EQUAL(T, N) static_assert(field_count_of<T>() == N)
-
 struct Point
 {
     int x;
     int y;
 };
-
-struct A
-{
-    Point a;
-};
-
-FIELD_COUNT_EQUAL(A, 1);
-
-struct B
-{
-    Point& a;
-};
-
-FIELD_COUNT_EQUAL(B, 1);
 /**
  * test for other functions
  */

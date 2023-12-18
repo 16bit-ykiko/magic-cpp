@@ -16,16 +16,34 @@ namespace magic::details
         constexpr Any(int) {}
 
         template <typename T>
+        requires std::is_copy_constructible_v<T>
         operator T&();
 
         template <typename T>
+        requires std::is_move_constructible_v<T>
         operator T&&();
+
+        template <typename T>
+        requires(!std::is_copy_constructible_v<T> || !std::is_move_constructible_v<T>)
+        operator T();
     };
 
-    template <typename T, std::size_t... Is>
-    consteval std::size_t try_initialize_with_n(std::index_sequence<Is...>)
+    template <typename T, std::size_t N>
+    consteval std::size_t try_initialize_with_n()
     {
-        return requires { T{Any(Is)...}; } && !requires { T{Any(Is)..., Any(0)}; };
+        return []<std::size_t... Is>(std::index_sequence<Is...>) {
+            return requires { T{Any(Is)...}; } && !requires { T{Any(Is)..., Any(0)}; };
+        }(std::make_index_sequence<N>{});
+    }
+
+    template <typename T, std::size_t N1, std::size_t N2, std::size_t N3>
+    consteval std::size_t try_initialize_with_three_parts()
+    {
+        return []<std::size_t... I1, std::size_t... I2, std::size_t... I3>(std::index_sequence<I1...>,
+                                                                           std::index_sequence<I2...>,
+                                                                           std::index_sequence<I3...>) {
+            return requires { T{Any(I1)..., {Any(I2)...}, Any(I3)...}; };
+        }(std::make_index_sequence<N1>{}, std::make_index_sequence<N2>{}, std::make_index_sequence<N3>{});
     }
 
     template <typename T, std::size_t N = 0>
@@ -33,10 +51,9 @@ namespace magic::details
     {
         if constexpr (N > sizeof(T) * 8 + 1)
         {
-            static_assert(N <= sizeof(T) * 8 + 1, "Unexpected Error in count fields");
+            static_assert(N <= sizeof(T) * 8 + 1, "Unexpected Error in total_count_of_fields");
         }
-
-        if constexpr (try_initialize_with_n<T>(std::make_index_sequence<N>{}))
+        else if constexpr (try_initialize_with_n<T, N>())
         {
             return N;
         }
@@ -47,7 +64,7 @@ namespace magic::details
     }
 
     template <typename T, std::size_t position, std::size_t N>
-    constexpr auto try_place_n_in_pos()
+    constexpr bool try_place_n_in_pos()
     {
         constexpr auto Total = total_count_of_fields<T>();
         if constexpr (N == 0)
@@ -56,37 +73,58 @@ namespace magic::details
         }
         else if constexpr (position + N <= Total)
         {
-            return []<std::size_t... I1, std::size_t... I2, std::size_t... I3>(std::index_sequence<I1...>,
-                                                                               std::index_sequence<I2...>,
-                                                                               std::index_sequence<I3...>) {
-                return requires { T{Any(I1)..., {Any(I2)...}, Any(I3)...}; };
-            }(std::make_index_sequence<position>{}, std::make_index_sequence<N>{}, std::make_index_sequence<Total - position - N>{});
+            return try_initialize_with_three_parts<T, position, N, Total - position - N>();
         }
-        else if constexpr (position + N > Total)
+        else
         {
             return false;
         }
     }
 
-    template <typename T, std::size_t pos>
-    constexpr auto search_max_in_pos()
+    template <typename T, std::size_t pos, std::size_t N = 0, std::size_t Max = 10>
+    constexpr bool has_extra_elements()
     {
         constexpr auto Total = total_count_of_fields<T>();
-        std::size_t result = 0;
-        [&]<std::size_t... Is>(std::index_sequence<Is...>)
-        { ((try_place_n_in_pos<T, pos, Is>() && !result ? result = Is : 0), ...); }(std::make_index_sequence<Total + 1>());
-        return result;
+        if constexpr (try_initialize_with_three_parts<T, pos, N, Total - pos - 1>())
+        {
+            return false;
+        }
+        else if constexpr (N + 1 <= Max)
+        {
+            return has_extra_elements<T, pos, N + 1>();
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    template <typename T, std::size_t pos>
+    constexpr std::size_t search_max_in_pos()
+    {
+        constexpr auto Total = total_count_of_fields<T>();
+        if constexpr (!has_extra_elements<T, pos>())
+        {
+            return 1;
+        }
+        else
+        {
+            std::size_t result = 0;
+            [&]<std::size_t... Is>(std::index_sequence<Is...>)
+            { ((try_place_n_in_pos<T, pos, Is>() ? result = Is : 0), ...); }(std::make_index_sequence<Total + 1>());
+            return result;
+        }
     }
 
     template <typename T, std::size_t N = 0>
-    constexpr auto search_extra_index(auto&& array)
+    constexpr auto search_all_extra_index(auto&& array)
     {
         constexpr auto total = total_count_of_fields<T>();
-        constexpr auto value = std::max(search_max_in_pos<T, N>(), static_cast<std::size_t>(1));
+        constexpr auto value = std::max<std::size_t>(search_max_in_pos<T, N>(), 1);
         array[N] = value;
         if constexpr (N + value < total)
         {
-            search_extra_index<T, N + value>(array);
+            search_all_extra_index<T, N + value>(array);
         }
     }
 
@@ -95,7 +133,7 @@ namespace magic::details
     {
         constexpr auto max = total_count_of_fields<T>();
         std::array<std::size_t, max> indices = {1};
-        search_extra_index<T>(indices);
+        search_all_extra_index<T>(indices);
         std::size_t result = max;
         std::size_t index = 0;
         while (index < max)
@@ -134,7 +172,7 @@ namespace magic
         }
         else
         {
-            return details::total_count_of_fields<T>();
+            return details::true_count_of_fields<T>();
         }
     }
 } // namespace magic

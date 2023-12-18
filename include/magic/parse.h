@@ -5,7 +5,6 @@
 #include <string_view>
 #include <vector>
 
-
 #if __clang__ || __GNUC__
 #define METAINFO                                                                                                                           \
     std::string_view name = __PRETTY_FUNCTION__;                                                                                           \
@@ -385,4 +384,4 @@ namespace magic::details
 #undef MAGIC_TEMPLATE_NAME
 } // namespace magic::details
 
-#endif
+#endif // MAGIC_CPP_MAGIC_PARSE_H
