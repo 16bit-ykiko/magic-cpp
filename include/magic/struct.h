@@ -24,7 +24,7 @@ namespace magic::details
         operator T&&();
 
         template <typename T>
-        requires(!std::is_copy_constructible_v<T> || !std::is_move_constructible_v<T>)
+        requires(!std::is_copy_constructible_v<T> && !std::is_move_constructible_v<T>)
         operator T();
     };
 
