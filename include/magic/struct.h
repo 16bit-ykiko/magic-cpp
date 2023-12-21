@@ -1,6 +1,7 @@
 #ifndef MAGIC_CPP_STRUCT_H
 #define MAGIC_CPP_STRUCT_H
 
+#include "magic/parse.h"
 #include <array>
 #include <string_view>
 #include <tuple>
@@ -183,7 +184,7 @@ namespace magic::details
     constexpr auto field_types_of_impl(T object)
     {
         constexpr auto N = field_count_of<T>();
-        // clang-format off
+// clang-format off
         #include "struct_bind_of_field_types.ge"
         // clang-format on
     }
@@ -193,7 +194,7 @@ namespace magic::details
     {
         using T = std::remove_cvref_t<decltype(object)>;
         constexpr auto N = field_count_of<T>();
-        // clang-format off
+// clang-format off
         #include "struct_bind_of_field_access.ge"
         // clang-format on
     }
@@ -275,19 +276,12 @@ namespace magic::details
     };
 
     template <typename T>
-    constexpr auto field_names_of_impl()
+    struct Names_Storage
     {
-        constexpr auto N = field_count_of<T>();
-        std::array<std::string_view, N> names{};
-
-        [&]<std::size_t... Is>(std::index_sequence<Is...>)
-        {
-            constexpr auto&& object = Storage<T>::value;
-            ((names[Is] = main_name_of_pointer<Wrapper{&field_of_impl<Is>(object)}>()), ...);
-        }(std::make_index_sequence<N>{});
-
-        return names;
-    }
+        constexpr static auto value = []<std::size_t... Is>(std::index_sequence<Is...>) {
+            return std::array<std::string_view, sizeof...(Is)>{main_name_of_pointer<Wrapper{&field_of_impl<Is>(Storage<T>::value)}>()...};
+        }(std::make_index_sequence<field_count_of<T>()>{});
+    };
 
 } // namespace magic::details
 
@@ -295,17 +289,20 @@ namespace magic
 {
     template <typename T>
     requires(std::is_aggregate_v<T> && std::is_default_constructible_v<T>)
-    constexpr auto field_names_of()
+    constexpr auto& field_names_of()
     {
-        return details::field_names_of_impl<T>();
+        return details::Names_Storage<T>::value;
     }
 
     template <typename T>
     requires(std::is_aggregate_v<T> && std::is_default_constructible_v<T>)
     constexpr std::string_view field_name_of(std::size_t Index)
     {
-        return details::field_names_of_impl<T>()[Index];
+        return field_names_of<T>()[Index];
     }
+
+    template <typename T>
+    constexpr std::string_view name_of();
 
     template <std::size_t N, typename T>
     struct Field
@@ -319,6 +316,8 @@ namespace magic
         using type = field_type_of<std::remove_cvref_t<T>, N>;
 
         constexpr static std::string_view name() { return field_name_of<std::remove_cvref_t<T>>(N); }
+
+        constexpr static std::string_view type_name() { return name_of<type>(); }
 
         constexpr static std::size_t index() { return N; }
 
@@ -334,11 +333,13 @@ namespace magic
     constexpr void foreach (Object&& object, auto&& functor)
     {
         using T = std::remove_cvref_t<decltype(object)>;
-        static_assert(std::is_aggregate_v<T> && std::is_default_constructible_v<T>,
-                      "T must be an aggregate type and default constructible");
-
-        [&]<std::size_t... Is>(std::index_sequence<Is...>)
-        { (functor(Field<Is, Object>{std::forward<Object>(object)}), ...); }(std::make_index_sequence<field_count_of<T>()>{});
+        constexpr auto condition = std::is_aggregate_v<T> && std::is_default_constructible_v<T>;
+        static_assert(condition, "T must be an aggregate type and default constructible");
+        if constexpr (condition)
+        {
+            [&]<std::size_t... Is>(std::index_sequence<Is...>)
+            { (functor(Field<Is, Object>{std::forward<Object>(object)}), ...); }(std::make_index_sequence<field_count_of<T>()>{});
+        }
     }
 } // namespace magic
 
