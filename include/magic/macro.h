@@ -22,13 +22,13 @@
     #endif // source_location
 
     // support for constexpr virtual functions
-    #if __cplusplus >= 202002L
+    #if __cplusplus >= 202002L || (defined(_MSC_VER) && _MSC_VER >= 1920)
         #define MAGIC_CPP_CONSTEXPR constexpr
     #else
         #define MAGIC_CPP_CONSTEXPR
     #endif // constexpr_virtual
 
-    #if __cplusplus >= 202002L
+    #if __cplusplus >= 202002L || (defined(_MSC_VER) && _MSC_VER >= 1920)
         #define MAGIC_CPP_CONSTEXPR_VIRTUAL constexpr virtual
     #else
         #define MAGIC_CPP_CONSTEXPR_VIRTUAL virtual
