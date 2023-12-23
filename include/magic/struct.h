@@ -1,15 +1,10 @@
 #ifndef MAGIC_CPP_STRUCT_H
 #define MAGIC_CPP_STRUCT_H
 
-#include "magic/parse.h"
 #include <array>
 #include <string_view>
 #include <tuple>
-#include <type_traits>
 
-// gcc 13 ice
-// msvc bug
-// namespace magic::details
 namespace magic::details
 {
     struct Any
@@ -184,8 +179,8 @@ namespace magic::details
     constexpr auto field_types_of_impl(T object)
     {
         constexpr auto N = field_count_of<T>();
-// clang-format off
-        #include "struct_bind_of_field_types.ge"
+        // clang-format off
+        #include "generate/struct_bind_of_field_types.code"
         // clang-format on
     }
 
@@ -194,8 +189,8 @@ namespace magic::details
     {
         using T = std::remove_cvref_t<decltype(object)>;
         constexpr auto N = field_count_of<T>();
-// clang-format off
-        #include "struct_bind_of_field_access.ge"
+        // clang-format off
+        #include "generate/struct_bind_of_field_access.code"
         // clang-format on
     }
 } // namespace magic::details
