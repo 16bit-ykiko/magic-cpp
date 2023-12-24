@@ -216,7 +216,7 @@ namespace magic::details
 namespace magic
 {
     template <typename T>
-    constexpr auto tree_of()
+    constexpr String tree_of()
     {
         magic::String result;
         auto* type = magic::details::parse<T>(false);
@@ -226,7 +226,7 @@ namespace magic
     }
 
     template <typename T>
-    constexpr auto full_tree_of()
+    constexpr String full_tree_of()
     {
         magic::String result;
         auto* type = magic::details::parse<T>(true);
@@ -236,7 +236,7 @@ namespace magic
     }
 
     template <typename T>
-    constexpr string_view full_name_of()
+    constexpr String full_name_of()
     {
         magic::String result;
         auto* type = magic::details::parse<T>(true);

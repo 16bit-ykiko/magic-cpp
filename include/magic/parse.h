@@ -70,8 +70,8 @@ namespace magic::details
 
     struct Type
     {
-        MAGIC_CPP_CONSTEXPR_VIRTUAL ~Type() = default;
-        MAGIC_CPP_CONSTEXPR_VIRTUAL TypeKind Kind() const = 0;
+        constexpr virtual ~Type() = default;
+        constexpr virtual TypeKind Kind() const = 0;
     };
 
     struct Pointer : public Type
@@ -79,9 +79,9 @@ namespace magic::details
         Type* pointee;
         string_view modifier;
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL ~Pointer() { delete pointee; }
+        constexpr virtual ~Pointer() { delete pointee; }
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL TypeKind Kind() const override { return TypeKind::POINTER; }
+        constexpr virtual TypeKind Kind() const override { return TypeKind::POINTER; }
     };
 
     struct Reference : public Type
@@ -89,9 +89,9 @@ namespace magic::details
         Type* pointee;
         string_view modifier;
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL ~Reference() { delete pointee; }
+        constexpr virtual ~Reference() { delete pointee; }
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL TypeKind Kind() const override { return TypeKind::REFERENCE; }
+        constexpr virtual TypeKind Kind() const override { return TypeKind::REFERENCE; }
     };
 
     struct Array : public Type
@@ -99,9 +99,9 @@ namespace magic::details
         Type* element;
         std::size_t size;
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL ~Array() { delete element; }
+        constexpr virtual ~Array() { delete element; }
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL TypeKind Kind() const override { return TypeKind::ARRAY; }
+        constexpr virtual TypeKind Kind() const override { return TypeKind::ARRAY; }
     };
 
     struct Function : public Type
@@ -110,13 +110,13 @@ namespace magic::details
         std::vector<Type*> parameters;
         string_view modifier;
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL ~Function()
+        constexpr virtual ~Function()
         {
             delete return_type;
             for (auto parameter : parameters) { delete parameter; }
         }
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL TypeKind Kind() const override { return TypeKind::FUNCTION; }
+        constexpr virtual TypeKind Kind() const override { return TypeKind::FUNCTION; }
     };
 
     struct Member : public Type
@@ -125,13 +125,13 @@ namespace magic::details
         Type* member_type;
         string_view modifier;
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL ~Member()
+        constexpr virtual ~Member()
         {
             delete class_type;
             delete member_type;
         }
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL TypeKind Kind() const override { return TypeKind::MEMBER; }
+        constexpr virtual TypeKind Kind() const override { return TypeKind::MEMBER; }
     };
 
     struct Template : public Type
@@ -140,21 +140,21 @@ namespace magic::details
         std::vector<Type*> parameters;
         string_view modifier;
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL ~Template()
+        constexpr virtual ~Template()
         {
             for (auto parameter : parameters) { delete parameter; }
         }
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL TypeKind Kind() const override { return TypeKind::TEMPLATE; }
+        constexpr virtual TypeKind Kind() const override { return TypeKind::TEMPLATE; }
     };
 
     struct NTTP : public Type
     {
         string_view name;
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL ~NTTP(){};
+        constexpr virtual ~NTTP(){};
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL TypeKind Kind() const override { return TypeKind::NTTP; }
+        constexpr virtual TypeKind Kind() const override { return TypeKind::NTTP; }
     };
 
     struct BasicType : public Type
@@ -162,9 +162,9 @@ namespace magic::details
         string_view name;
         string_view modifier;
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL ~BasicType(){};
+        constexpr virtual ~BasicType(){};
 
-        MAGIC_CPP_CONSTEXPR_VIRTUAL TypeKind Kind() const override { return TypeKind::BASIC; }
+        constexpr virtual TypeKind Kind() const override { return TypeKind::BASIC; }
     };
 } // namespace magic::details
 
@@ -218,7 +218,7 @@ namespace magic::details
     }
 
     template <typename T>
-    MAGIC_CPP_CONSTEXPR Type* parse(bool is_full_name)
+    constexpr Type* parse(bool is_full_name)
     {
         if constexpr (requires { magic::type_info<T>::name; })
         {
@@ -288,7 +288,7 @@ namespace magic::details
     template <typename R, typename... Args>
     struct type_traits<R(Args...)>
     {
-        MAGIC_CPP_CONSTEXPR static Type* parse(string_view modifier, bool is_full_name)
+        constexpr static Type* parse(string_view modifier, bool is_full_name)
         {
             Function* result = new Function;
             result->return_type = magic::details::parse<R>(is_full_name);
@@ -302,7 +302,7 @@ namespace magic::details
     template <typename M, typename C>
     struct type_traits<M C::*>
     {
-        MAGIC_CPP_CONSTEXPR static Type* parse(string_view modifier, bool is_full_name)
+        constexpr static Type* parse(string_view modifier, bool is_full_name)
         {
             Member* result = new Member;
             result->class_type = magic::details::parse<C>(is_full_name);
@@ -322,7 +322,7 @@ namespace magic::details
 namespace magic::details
 {
 #define MAGIC_PARSE_START                                                                                                                  \
-    MAGIC_CPP_CONSTEXPR static Type* parse(string_view modifier, bool is_full_name)                                                        \
+    constexpr static Type* parse(string_view modifier, bool is_full_name)                                                                  \
     {                                                                                                                                      \
         Template* result = new Template;                                                                                                   \
         result->name = name;                                                                                                               \

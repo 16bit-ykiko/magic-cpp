@@ -17,7 +17,7 @@ static_assert(name_of<std::size_t>() == "std::size_t");
 static_assert(name_of<std::vector<int>>() == "std::vector<int>");
 static_assert(name_of<Point>() == "Point");
 
-int main() 
+int main()
 {
     std::cout << tree_of<std::make_index_sequence<10>>() << std::endl;
     std::cout << tree_of<std::map<int, std::string>>() << std::endl;

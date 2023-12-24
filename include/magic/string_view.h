@@ -18,11 +18,7 @@ namespace magic
         std::size_t m_Size;
 
       public:
-        constexpr string_view() noexcept
-        {
-            m_Data = nullptr;
-            m_Size = 0;
-        }
+        constexpr string_view() : m_Data(nullptr), m_Size(0) {}
 
         constexpr string_view(const string_view& other) noexcept = default;
 
@@ -58,21 +54,21 @@ namespace magic
       public:
         constexpr inline static std::size_t npos = UINTMAX_MAX;
 
-        [[nodiscard]] constexpr bool empty() const noexcept { return m_Size == 0; }
+        constexpr bool empty() const noexcept { return m_Size == 0; }
 
-        [[nodiscard]] constexpr std::size_t size() const noexcept { return m_Size; }
+        constexpr std::size_t size() const noexcept { return m_Size; }
 
-        [[nodiscard]] constexpr std::size_t length() const noexcept { return m_Size; }
+        constexpr std::size_t length() const noexcept { return m_Size; }
 
-        [[nodiscard]] constexpr const char* begin() const noexcept { return m_Data; }
+        constexpr const char* begin() const noexcept { return m_Data; }
 
-        [[nodiscard]] constexpr const char* end() const noexcept { return m_Data + m_Size; }
+        constexpr const char* end() const noexcept { return m_Data + m_Size; }
 
-        [[nodiscard]] constexpr const char* data() const noexcept { return m_Data; }
+        constexpr const char* data() const noexcept { return m_Data; }
 
-        [[nodiscard]] constexpr char operator[](std::size_t index) const noexcept { return m_Data[index]; }
+        constexpr char operator[](std::size_t index) const noexcept { return m_Data[index]; }
 
-        [[nodiscard]] constexpr std::size_t find(string_view str) const noexcept
+        constexpr std::size_t find(string_view str) const noexcept
         {
             for (std::size_t i = 0; i < m_Size; i++)
             {
@@ -96,7 +92,7 @@ namespace magic
             return npos;
         }
 
-        [[nodiscard]] constexpr std::size_t rfind(string_view str) const noexcept
+        constexpr std::size_t rfind(string_view str) const noexcept
         {
             for (std::size_t i = m_Size - 1; i > 0; i--)
             {
@@ -120,10 +116,7 @@ namespace magic
             return npos;
         }
 
-        [[nodiscard]] constexpr string_view substr(std::size_t start, std::size_t end) const noexcept
-        {
-            return {m_Data + start, end - start};
-        }
+        constexpr string_view substr(std::size_t start, std::size_t end) const noexcept { return {m_Data + start, end - start}; }
     };
 } // namespace magic
 #endif
