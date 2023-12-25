@@ -128,17 +128,24 @@ namespace magic::details
     constexpr auto true_count_of_fields()
     {
         constexpr auto max = total_count_of_fields<T>();
-        std::array<std::size_t, max> indices = {1};
-        search_all_extra_index<T>(indices);
-        std::size_t result = max;
-        std::size_t index = 0;
-        while (index < max)
+        if constexpr (max == 0)
         {
-            auto n = indices[index];
-            result -= n - 1;
-            index += n;
+            return 0;
         }
-        return result;
+        else
+        {
+            std::array<std::size_t, max> indices = {1};
+            search_all_extra_index<T>(indices);
+            std::size_t result = max;
+            std::size_t index = 0;
+            while (index < max)
+            {
+                auto n = indices[index];
+                result -= n - 1;
+                index += n;
+            }
+            return result;
+        }
     }
 } // namespace magic::details
 namespace magic
@@ -179,7 +186,7 @@ namespace magic::details
     constexpr auto field_types_of_impl(T object)
     {
         constexpr auto N = field_count_of<T>();
-        // clang-format off
+// clang-format off
         #include "generate/struct_bind_of_field_types.code"
         // clang-format on
     }
@@ -189,7 +196,7 @@ namespace magic::details
     {
         using T = std::remove_cvref_t<decltype(object)>;
         constexpr auto N = field_count_of<T>();
-        // clang-format off
+// clang-format off
         #include "generate/struct_bind_of_field_access.code"
         // clang-format on
     }
