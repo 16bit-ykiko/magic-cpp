@@ -27,9 +27,7 @@ namespace magic::details
     template <typename T, std::size_t N>
     consteval std::size_t try_initialize_with_n()
     {
-        return []<std::size_t... Is>(std::index_sequence<Is...>) {
-            return requires { T{Any(Is)...}; } && !requires { T{Any(Is)..., Any(0)}; };
-        }(std::make_index_sequence<N>{});
+        return []<std::size_t... Is>(std::index_sequence<Is...>) { return requires { T{Any(Is)...}; }; }(std::make_index_sequence<N>{});
     }
 
     template <typename T, std::size_t N1, std::size_t N2, std::size_t N3>
@@ -45,11 +43,7 @@ namespace magic::details
     template <typename T, std::size_t N = 0>
     consteval std::size_t total_count_of_fields()
     {
-        if constexpr (N > sizeof(T) * 8 + 1)
-        {
-            static_assert(N <= sizeof(T) * 8 + 1, "Unexpected Error in total_count_of_fields");
-        }
-        else if constexpr (try_initialize_with_n<T, N>())
+        if constexpr (try_initialize_with_n<T, N>() && !try_initialize_with_n<T, N + 1>())
         {
             return N;
         }
@@ -186,7 +180,7 @@ namespace magic::details
     constexpr auto field_types_of_impl(T object)
     {
         constexpr auto N = field_count_of<T>();
-// clang-format off
+        // clang-format off
         #include "generate/struct_bind_of_field_types.code"
         // clang-format on
     }
@@ -196,7 +190,7 @@ namespace magic::details
     {
         using T = std::remove_cvref_t<decltype(object)>;
         constexpr auto N = field_count_of<T>();
-// clang-format off
+        // clang-format off
         #include "generate/struct_bind_of_field_access.code"
         // clang-format on
     }

@@ -245,6 +245,14 @@ namespace magic
     {
         return details::enum_names_storage<T>::names;
     }
+
+    template <typename T>
+    requires std::is_enum_v<T>
+    constexpr auto& name_of(T value)
+    {
+        constexpr auto start = enum_start<T>();
+        return details::enum_names_storage<T>::names[static_cast<std::size_t>(value + start)];
+    }
 } // namespace magic
 
 #endif // MAGIC_CPP_ENUM_H
