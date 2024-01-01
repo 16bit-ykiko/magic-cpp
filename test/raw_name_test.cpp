@@ -49,7 +49,7 @@ TEST(Raw_Name_Of, Enum)
     ASSERT_EQ((raw_name_of_enum<CE::C>()), "C") << "test for enum";
 }
 
-#ifdef MAGIC_CPP_20
+#ifdef MAGIC_CPP_20_SUPPORT
 
 struct X
 {

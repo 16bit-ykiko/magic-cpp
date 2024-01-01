@@ -36,4 +36,3 @@ target_link_libraries(all_tests GTest::gtest_main)
 # 使用Google Test自动发现所有测试并将其添加到测试套件中
 include(GoogleTest)
 gtest_discover_tests(all_tests)
-

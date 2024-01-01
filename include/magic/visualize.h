@@ -5,12 +5,20 @@
 #include <format>
 #endif
 
-#include "customized_type_name.h"
+#include "customization.h"
 #include "type_tree.h"
 #include <array>
+#include <cstring>
 
 namespace magic
 {
+    struct VisualizeOption
+    {
+        bool UTF8_SUPPORT = true;
+        bool COLORFUL_SUPPORT = true;
+        bool FULL_NAME = false;
+    };
+
     struct HighlightConfig
     {
         std::uint32_t type;
@@ -31,13 +39,16 @@ namespace magic
     };
 
     constexpr static inline HighlightConfig Light = {
-        .type = 0x4285F4,     // Light blue for type
-        .nttp = 0x0F9D58,     // Green for non-type template parameter
-        .tmpl = 0xFF5722,     // Orange for template
-        .builtin = 0x7C4DFF,  // Purple for built-in
-        .modifier = 0xFBC02D, // Yellow for modifier
-        .tag = 0x03A9F4,      // Light blue for tag
+        .type = 0x4285F4,
+        .nttp = 0x0F9D58,
+        .tmpl = 0xFF5722,
+        .builtin = 0x7C4DFF,
+        .modifier = 0xFBC02D,
+        .tag = 0x03A9F4,
     };
+
+    template <typename T>
+    std::string visualize(const VisualizeOption& option = {}, const HighlightConfig& color = Dark);
 
 } // namespace magic
 
@@ -55,7 +66,7 @@ namespace magic::details
     {
         std::array<char, 256> buffer{};
         std::size_t args_index = 0;
-        std::array<std::string, sizeof...(Args)> args_str;
+        std::array<std::string, sizeof...(Args)> args_str{};
         auto make_str = [&](auto&& arg)
         {
             using Type = std::decay_t<decltype(arg)>;
@@ -67,9 +78,9 @@ namespace magic::details
             {
                 args_str[args_index] = std::forward<decltype(arg)>(arg);
             }
-            else if constexpr (std::is_convertible_v<Type, std::string>)
+            else if constexpr (std::is_constructible_v<std::string, Type>)
             {
-                args_str[args_index] = std::forward<decltype(arg)>(arg);
+                args_str[args_index] = std::string{arg};
             }
             args_index += 1;
         };
@@ -98,172 +109,177 @@ namespace magic::details
     }
 #endif // __cpp_lib_format
 
-    template <typename T>
-    std::string colorize(T&& text, std::uint32_t color)
+    class VisualizationImpl
     {
-        uint8_t R = (color >> 16) & 0xFF;
-        uint8_t G = (color >> 8) & 0xFF;
-        uint8_t B = color & 0xFF;
-        return format("\033[38;2;{};{};{}m{}\033[0m", R, G, B, std::forward<T>(text));
-    }
-
-    inline void visualize_impl(std::string& result, Type* type, std::string prefix = "", bool is_last = true, std::string tag = "",
-                               const HighlightConfig& color = Dark)
-    {
-        std::string branch = format("{}{}{}", prefix, is_last ? "└── " : "├── ", colorize(tag, color.tag));
-        prefix += (is_last ? "    " : "│   ");
-
-        for (std::size_t i = 0; i < tag.size(); i++) { prefix.push_back(' '); }
-        if (type->Kind() == TypeKind::BASIC)
+        template <typename T>
+        inline friend std::string magic::visualize(const VisualizeOption& option, const HighlightConfig& color);
+        struct DirectoryTreeSymbols
         {
-            BasicType* basic = static_cast<BasicType*>(type);
-            std::string name = colorize(std::move(basic->name), color.type);
-            std::string modifier;
-            modifier += basic->is_const ? "const" : "";
-            modifier += basic->is_volatile ? (modifier.empty() ? "volatile" : " volatile") : "";
-            if (modifier.empty())
+            std::string_view branch;
+            std::string_view vertical;
+            std::string_view corner;
+            std::string_view space;
+        };
+
+        std::string result;
+        HighlightConfig config;
+        DirectoryTreeSymbols symbols;
+        bool colorful_support;
+
+      public:
+        VisualizationImpl(const VisualizeOption& option, const HighlightConfig& config)
+            : result(), config(config), colorful_support(option.COLORFUL_SUPPORT)
+        {
+            if (option.UTF8_SUPPORT)
             {
-                result += format("{}{}\n", branch, std::move(name));
+                symbols = {"├── ", "│   ", "└── ", "    "};
             }
             else
             {
-                modifier = colorize(std::move(modifier), color.modifier);
-                result += format("{}{} [{}]\n", branch, std::move(name), std::move(modifier));
+                symbols = {"|-- ", "|   ", "`-- ", "    "};
             }
         }
-        else if (type->Kind() == TypeKind::POINTER)
+
+        template <typename T>
+        std::string colorize(T&& text, std::uint32_t color)
         {
-            Pointer* pointer = static_cast<Pointer*>(type);
-            std::string name = colorize("ptr", color.builtin);
-            std::string modifier;
-            modifier += pointer->is_const ? "const" : "";
-            modifier += pointer->is_volatile ? (modifier.empty() ? "volatile" : " volatile") : "";
+            if (!colorful_support)
+            {
+                return std::forward<T>(text);
+            }
+            uint8_t R = (color >> 16) & 0xFF;
+            uint8_t G = (color >> 8) & 0xFF;
+            uint8_t B = color & 0xFF;
+            return format("\033[38;2;{};{};{}m{}\033[0m", R, G, B, std::forward<T>(text));
+        }
+
+        void visualize(std::string&& branch, std::string&& name, std::string&& modifier)
+        {
             if (modifier.empty())
             {
-                result += format("{}{}\n", branch, std::move(name));
+                result += format("{}{}\n", std::move(branch), std::move(name));
             }
             else
             {
-                modifier = colorize(std::move(modifier), color.modifier);
-                result += format("{}{} [{}]\n", branch, std::move(name), std::move(modifier));
+                modifier = colorize(std::move(modifier), config.modifier);
+                result += format("{}{} [{}]\n", std::move(branch), std::move(name), std::move(modifier));
             }
-            visualize_impl(result, pointer->pointee, prefix, true, "", color);
         }
-        else if (type->Kind() == TypeKind::REFERENCE)
+
+        void visualize(Type* type, std::string prefix, std::string tag, bool is_last)
         {
-            Reference* ref = static_cast<Reference*>(type);
-            std::string name = colorize("ref", color.builtin);
-            std::string modifier = colorize(ref->is_lvalue_ref ? "&" : "&&", color.modifier);
-            if (modifier.empty())
+            std::string branch = format("{}{}{}", prefix, (is_last ? symbols.corner : symbols.branch), colorize(tag, config.tag));
+            prefix += (is_last ? symbols.space : symbols.vertical);
+
+            for (std::size_t i = 0; i < tag.size(); i++) { prefix.push_back(' '); }
+            if (type->Kind() == TypeKind::BASIC)
             {
+                BasicType* basic = static_cast<BasicType*>(type);
+                std::string name = colorize(std::move(basic->name), config.type);
+                std::string modifier = basic->is_const ? "const" : "";
+                modifier += basic->is_volatile ? (modifier.empty() ? "volatile" : " volatile") : "";
+                visualize(std::move(branch), std::move(name), std::move(modifier));
+            }
+            else if (type->Kind() == TypeKind::POINTER)
+            {
+                Pointer* pointer = static_cast<Pointer*>(type);
+                std::string name = colorize("ptr", config.builtin);
+                std::string modifier = pointer->is_const ? "const" : "";
+                modifier += pointer->is_volatile ? (modifier.empty() ? "volatile" : " volatile") : "";
+                visualize(std::move(branch), std::move(name), std::move(modifier));
+                visualize(pointer->pointee, prefix, "", true);
+            }
+            else if (type->Kind() == TypeKind::REFERENCE)
+            {
+                Reference* ref = static_cast<Reference*>(type);
+                std::string name = colorize("ref", config.builtin);
+                std::string modifier = colorize(ref->is_lvalue_ref ? "&" : "&&", config.modifier);
+                visualize(std::move(branch), std::move(name), std::move(modifier));
+                visualize(ref->referencee, prefix, "", true);
+            }
+            else if (type->Kind() == TypeKind::ARRAY)
+            {
+                Array* array = static_cast<Array*>(type);
+                std::string name = colorize("array", config.builtin);
+                std::string modifier = colorize(format("N = {}", array->size), config.modifier);
+                result += format("{}{} [{}]\n", branch, std::move(name), std::move(modifier));
+                visualize(array->element, prefix, "", true);
+            }
+            else if (type->Kind() == TypeKind::FUNCTION)
+            {
+                Function* function = static_cast<Function*>(type);
+                std::string name = colorize("function", config.builtin);
+                std::string modifier = function->isConst() ? "const" : "";
+                modifier += function->isVolatile() ? (modifier.empty() ? "volatile" : " volatile") : "";
+                modifier += function->isLvalueRef() ? (modifier.empty() ? "&" : " &") : "";
+                modifier += function->isRvalueRef() ? (modifier.empty() ? "&&" : " &&") : "";
+                modifier += function->isNoexcept() ? (modifier.empty() ? "noexcept" : " noexcept") : "";
+                visualize(std::move(branch), std::move(name), std::move(modifier));
+
+                std::vector<Type*>& params = function->parameters;
+                const auto size = params.size();
+                visualize(function->return_type, prefix, "R: ", false);
+
+                for (std::size_t index = 0; index < size; index++)
+                {
+                    Type* param = params[index];
+                    is_last = (index == size - 1) && !function->isVariadic();
+                    visualize(param, prefix, format("{}: ", index), is_last);
+                }
+
+                tag = colorize(format("{}: ", size), config.tag);
+                if (function->isVariadic())
+                {
+                    result += format("{}{}{}\n", prefix += symbols.corner, tag, colorize("<...>", config.builtin));
+                }
+                else if (params.empty())
+                {
+                    result += format("{}{}{}\n", prefix += symbols.corner, tag, colorize("<void>", config.builtin));
+                }
+            }
+            else if (type->Kind() == TypeKind::MEMBER)
+            {
+                Member* member = static_cast<Member*>(type);
+                std::string name = colorize("member ptr", config.builtin);
+                std::string modifier = member->is_const ? "const" : "";
+                modifier += member->is_volatile ? (modifier.empty() ? "volatile" : " volatile") : "";
+                visualize(std::move(branch), std::move(name), std::move(modifier));
+                visualize(member->class_type, prefix, "C: ", false);
+                visualize(member->member_type, prefix, "M: ", true);
+            }
+            else if (type->Kind() == TypeKind::TEMPLATE)
+            {
+                Template* template_ = static_cast<Template*>(type);
+                std::string name = colorize(std::move(template_->name), config.tmpl);
+                std::string modifier = "template";
+                modifier += template_->is_const ? " const" : "";
+                modifier += template_->is_volatile ? " volatile" : "";
+                modifier = colorize(std::move(modifier), config.modifier);
+                visualize(std::move(branch), std::move(name), std::move(modifier));
+
+                for (std::size_t index = 0; index < template_->parameters.size(); index++)
+                {
+                    Type* parameter = template_->parameters[index];
+                    is_last = index == template_->parameters.size() - 1;
+                    visualize(parameter, prefix, format("{}: ", index), is_last);
+                }
+            }
+            else if (type->Kind() == TypeKind::NTTP)
+            {
+                NTTP* nttp = static_cast<NTTP*>(type);
+                std::string name = colorize("nttp", config.builtin);
                 result += format("{}{}\n", branch, std::move(name));
+                visualize(nttp->type, prefix, "T: ", false);
+                name = colorize(nttp->name, config.nttp);
+                tag = colorize("V: ", config.tag);
+                result += format("{}{}{}\n", prefix += symbols.corner, tag, std::move(name));
             }
             else
             {
-                modifier = colorize(std::move(modifier), color.modifier);
-                result += format("{}{} [{}]\n", branch, std::move(name), std::move(modifier));
-            }
-            visualize_impl(result, ref->referencee, prefix, true, "", color);
-        }
-        else if (type->Kind() == TypeKind::ARRAY)
-        {
-            Array* array = static_cast<Array*>(type);
-            std::string name = colorize("array", color.builtin);
-            std::string modifier = colorize(format("N = {}", array->size), color.modifier);
-            result += format("{}{} [{}]\n", branch, std::move(name), std::move(modifier));
-            visualize_impl(result, array->element, prefix, true, "", color);
-        }
-        else if (type->Kind() == TypeKind::FUNCTION)
-        {
-            Function* function = static_cast<Function*>(type);
-            std::string name = colorize("function", color.builtin);
-            std::string modifier;
-            modifier += function->isConst() ? "const" : "";
-            modifier += function->isVolatile() ? (modifier.empty() ? "volatile" : " volatile") : "";
-            modifier += function->isLvalueRef() ? "&" : "";
-            modifier += function->isRvalueRef() ? "&&" : "";
-            modifier += function->isNoexcept() ? (modifier.empty() ? "noexcept" : " noexcept") : "";
-            if (modifier.empty())
-            {
-                result += format("{}{}\n", branch, std::move(name));
-            }
-            else
-            {
-                modifier = colorize(std::move(modifier), color.modifier);
-                result += format("{}{} [{}]\n", branch, std::move(name), std::move(modifier));
-            }
-
-            std::vector<Type*>& params = function->parameters;
-            const auto size = params.size();
-
-            visualize_impl(result, function->return_type, prefix, false, "R: ", color);
-
-            for (std::size_t index = 0; index < size; index++)
-            {
-                Type* param = params[index];
-                is_last = (index == size - 1) && !function->isVariadic();
-                visualize_impl(result, param, prefix, is_last, format("{}: ", index), color);
-            }
-
-            tag = colorize(format("{}: ", size), color.tag);
-
-            if (function->isVariadic())
-            {
-                result += format("{}{}{}\n", prefix + "└── ", tag, colorize("<...>", color.builtin));
-            }
-            else if (params.empty())
-            {
-                result += format("{}{}{}\n", prefix + "└── ", tag, colorize("<void>", color.builtin));
+                magic::unreachable();
             }
         }
-        else if (type->Kind() == TypeKind::MEMBER)
-        {
-            Member* member = static_cast<Member*>(type);
-            std::string name = colorize("member ptr", color.builtin);
-            std::string modifier;
-            modifier += member->is_const ? "const" : "";
-            modifier += member->is_volatile ? (modifier.empty() ? "volatile" : " volatile") : "";
-            if (modifier.empty())
-            {
-                result += format("{}{}\n", branch, std::move(name));
-            }
-            else
-            {
-                modifier = colorize(std::move(modifier), color.modifier);
-                result += format("{}{} [{}]\n", branch, std::move(name), std::move(modifier));
-            }
-
-            visualize_impl(result, member->class_type, prefix, false, "C: ", color);
-            visualize_impl(result, member->member_type, prefix, true, "M: ", color);
-        }
-        else if (type->Kind() == TypeKind::TEMPLATE)
-        {
-            Template* template_ = static_cast<Template*>(type);
-            std::string name = colorize(std::move(template_->name), color.tmpl);
-            std::string modifier = "template";
-            modifier += template_->is_const ? " const" : "";
-            modifier += template_->is_volatile ? " volatile" : "";
-            modifier = colorize(std::move(modifier), color.modifier);
-            result += format("{}{} [{}]\n", branch, std::move(name), std::move(modifier));
-
-            for (std::size_t index = 0; index < template_->parameters.size(); index++)
-            {
-                Type* parameter = template_->parameters[index];
-                is_last = index == template_->parameters.size() - 1;
-                visualize_impl(result, parameter, prefix, is_last, format("{}: ", index), color);
-            }
-        }
-        else if (type->Kind() == TypeKind::NTTP)
-        {
-            NTTP* nttp = static_cast<NTTP*>(type);
-            std::string name = colorize("nttp", color.builtin);
-            result += format("{}{}\n", branch, std::move(name));
-            visualize_impl(result, nttp->type, prefix, false, "T: ", color);
-            name = colorize(nttp->name, color.nttp);
-            tag = colorize("V: ", color.tag);
-            result += format("{}{}{}\n", prefix + "└── ", tag, std::move(name));
-        }
-    }
+    };
 
     inline void display_name_of(std::string& result, Type* type, bool is_full_name) {}
 
@@ -272,13 +288,14 @@ namespace magic::details
 namespace magic
 {
     template <typename T>
-    std::string visualize(const HighlightConfig& color = Dark, bool is_full_name = false)
+    std::string visualize(const VisualizeOption& option, const HighlightConfig& config)
     {
         std::string result;
-        auto* type = details::parse<T>(is_full_name);
-        details::visualize_impl(result, type, "", true, "", color);
+        Type* type = details::parse<T>(option.FULL_NAME);
+        details::VisualizationImpl visualizationImpl{option, config};
+        visualizationImpl.visualize(type, "", "", true);
         delete type;
-        return result;
+        return std::move(visualizationImpl.result);
     }
 
 } // namespace magic

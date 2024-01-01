@@ -113,6 +113,7 @@ TEST(Field_Count, Ref)
     ASSERT_EQ(field_count_of<VLRConstRef>(), 4);
 }
 
+#if MAGIC_CPP_C_ARRAY_SUPPORT
 TEST(Field_Count, Array)
 {
     struct Vec3
@@ -147,3 +148,4 @@ TEST(Field_Count, Array)
 
     ASSERT_EQ(field_count_of<Vec3Array3>(), 3);
 }
+#endif

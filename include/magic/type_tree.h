@@ -320,5 +320,7 @@ namespace magic::details
 namespace magic
 {
     using details::parse;
-}
+    using details::Type;
+    using details::TypeKind;
+} // namespace magic
 #endif

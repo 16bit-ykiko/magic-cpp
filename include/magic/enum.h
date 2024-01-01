@@ -3,7 +3,7 @@
 
 #include "macro.h"
 
-#ifdef MAGIC_CPP_20
+#ifdef MAGIC_CPP_20_SUPPORT
 #include "raw_name.h"
 #include <array>
 

@@ -3,7 +3,7 @@
 
 #include "macro.h"
 
-#ifdef MAGIC_CPP_20
+#ifdef MAGIC_CPP_20_SUPPORT
 
 #include "field_count.h"
 #include "raw_name.h"

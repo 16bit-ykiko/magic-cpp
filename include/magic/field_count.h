@@ -3,6 +3,8 @@
 
 #include <array>
 
+#define MAGIC_CPP_C_ARRAY_SUPPORT 0
+
 namespace magic::details
 {
     struct Any
@@ -28,16 +30,6 @@ namespace magic::details
         return []<std::size_t... Is>(std::index_sequence<Is...>) { return requires { T{Any(Is)...}; }; }(std::make_index_sequence<N>{});
     }
 
-    template <typename T, std::size_t N1, std::size_t N2, std::size_t N3>
-    consteval std::size_t try_initialize_with_three_parts()
-    {
-        return []<std::size_t... I1, std::size_t... I2, std::size_t... I3>(std::index_sequence<I1...>,
-                                                                           std::index_sequence<I2...>,
-                                                                           std::index_sequence<I3...>) {
-            return requires { T{Any(I1)..., {Any(I2)...}, Any(I3)...}; };
-        }(std::make_index_sequence<N1>{}, std::make_index_sequence<N2>{}, std::make_index_sequence<N3>{});
-    }
-
     template <typename T, std::size_t N = 0>
     consteval std::size_t total_count_of_fields()
     {
@@ -49,6 +41,21 @@ namespace magic::details
         {
             return total_count_of_fields<T, N + 1>();
         }
+    }
+} // namespace magic::details
+
+#if MAGIC_CPP_C_ARRAY_SUPPORT
+namespace magic::details
+{
+
+    template <typename T, std::size_t N1, std::size_t N2, std::size_t N3>
+    consteval std::size_t try_initialize_with_three_parts()
+    {
+        return []<std::size_t... I1, std::size_t... I2, std::size_t... I3>(std::index_sequence<I1...>,
+                                                                           std::index_sequence<I2...>,
+                                                                           std::index_sequence<I3...>) {
+            return requires { T{Any(I1)..., {Any(I2)...}, Any(I3)...}; };
+        }(std::make_index_sequence<N1>{}, std::make_index_sequence<N2>{}, std::make_index_sequence<N3>{});
     }
 
     template <typename T, std::size_t position, std::size_t N>
@@ -140,6 +147,7 @@ namespace magic::details
         }
     }
 } // namespace magic::details
+#endif
 
 namespace magic
 {
@@ -168,7 +176,11 @@ namespace magic
         }
         else
         {
+#if MAGIC_CPP_C_ARRAY_SUPPORT
             return details::true_count_of_fields<T>();
+#else
+            return details::total_count_of_fields<T>();
+#endif
         }
     }
 } // namespace magic

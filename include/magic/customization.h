@@ -1,5 +1,5 @@
-#ifndef MAGIC_CPP_CUSTOMIZED_TYPE_NAME_H
-#define MAGIC_CPP_CUSTOMIZED_TYPE_NAME_H
+#ifndef MAGIC_CPP_customization_H
+#define MAGIC_CPP_customization_H
 #include "type_tree.h"
 
 template <>
