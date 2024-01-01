@@ -2,40 +2,16 @@
 #define MAGIC_CPP_ENUM_H
 
 #include "macro.h"
-#include "string_view.h"
+
+#ifdef MAGIC_CPP_20
+#include "raw_name.h"
 #include <array>
-#include <iostream>
-#include <type_traits>
 
 #define ENUM_SEARCH_RANGE 32
 namespace magic
 {
     template <typename T>
     struct type_info;
-
-    template <auto value>
-    requires std::is_enum_v<decltype(value)>
-    constexpr auto name_of()
-    {
-        // clang-format off
-        string_view name = MAGIC_CPP_FUNCTION_NAME;
-        #if __clang__ || __GNUC__
-            std::size_t r1 = name.rfind("::");
-            std::size_t r2 = name.rfind("value = ");
-            std::size_t last = name.rfind("]");
-            name = (r1 != string_view::npos && r1 > r2) ? name.substr(r1 + 2, last) : name.substr(r2 + 8 , last);
-            return name.find(")") != string_view::npos ? "" : name;
-        #elif _MSC_VER
-            std::size_t r1 = name.rfind("::");
-            std::size_t r2 = name.rfind("name_of<");
-            std::size_t last = name.rfind(">");
-            name = (r1 != string_view::npos && r1 > r2) ? name.substr(r1 + 2, last) : name.substr(r2 + 8, last);
-            return name.find(")") != string_view::npos ? "" : name;
-        #else
-            static_assert(false, "not supported compiler");
-        #endif
-        // clang-format on
-    }
 } // namespace magic
 
 namespace magic::details
@@ -43,13 +19,13 @@ namespace magic::details
     template <typename T, std::ptrdiff_t N = 0>
     consteval std::ptrdiff_t search_possible_enum_start()
     {
-        if constexpr (name_of<static_cast<T>(N)>() != "")
+        if constexpr (raw_name_of_enum<static_cast<T>(N)>() != "")
         {
             return N;
         }
         else if constexpr (std::is_signed_v<std::underlying_type_t<T>>)
         {
-            if constexpr (name_of<static_cast<T>(-N)>() != "")
+            if constexpr (raw_name_of_enum<static_cast<T>(-N)>() != "")
             {
                 return -N;
             }
@@ -68,7 +44,7 @@ namespace magic::details
     consteval std::ptrdiff_t search_possible_continuous_enum_max()
     {
         constexpr auto is_end = []<std::size_t... Is>(std::index_sequence<Is...>)
-        { return (name_of<static_cast<T>(N + Is)>().empty() && ...); }(std::make_index_sequence<8>{});
+        { return (raw_name_of_enum<static_cast<T>(N + Is)>().empty() && ...); }(std::make_index_sequence<8>{});
 
         if constexpr (is_end)
         {
@@ -130,9 +106,9 @@ namespace magic::details
     consteval auto search_possible_bit_field_enum_length()
     {
         constexpr auto max = sizeof(T) * 8;
-        std::size_t result = name_of<static_cast<T>(0)>() != "";
+        std::size_t result = raw_name_of_enum<static_cast<T>(0)>() != "";
         [&]<std::size_t... Is>(std::index_sequence<Is...>)
-        { ((name_of<static_cast<T>(1 << Is)>() != "" ? result++ : result), ...); }(std::make_index_sequence<max>{});
+        { ((raw_name_of_enum<static_cast<T>(1 << Is)>() != "" ? result++ : result), ...); }(std::make_index_sequence<max>{});
         return result;
     }
 
@@ -163,23 +139,23 @@ namespace magic::details
             constexpr auto start = enum_start<T>();
             constexpr auto max = enum_max<T>();
             constexpr auto length = max - start + 1;
-            std::array<string_view, length> names{};
-            split_initialize<T, length>([&]<std::size_t I>() { names[I] = name_of<static_cast<T>(start + I)>(); });
+            std::array<std::string_view, length> names{};
+            split_initialize<T, length>([&]<std::size_t I>() { names[I] = raw_name_of_enum<static_cast<T>(start + I)>(); });
             return names;
         }
         else
         {
             constexpr auto length = search_possible_bit_field_enum_length<T>();
-            std::array<string_view, length> names{};
-            constexpr auto has_zero = name_of<static_cast<T>(0)>() != "";
+            std::array<std::string_view, length> names{};
+            constexpr auto has_zero = raw_name_of_enum<static_cast<T>(0)>() != "";
             if constexpr (has_zero)
             {
-                names[0] = name_of<static_cast<T>(0)>();
-                split_initialize<T, length - 1>([&]<std::size_t I>() { names[I + 1] = name_of<static_cast<T>(1 << I)>(); });
+                names[0] = raw_name_of_enum<static_cast<T>(0)>();
+                split_initialize<T, length - 1>([&]<std::size_t I>() { names[I + 1] = raw_name_of_enum<static_cast<T>(1 << I)>(); });
             }
             else
             {
-                split_initialize<T, length>([&]<std::size_t I>() { names[I] = name_of<static_cast<T>(1 << I)>(); });
+                split_initialize<T, length>([&]<std::size_t I>() { names[I] = raw_name_of_enum<static_cast<T>(1 << I)>(); });
             }
             return names;
         }
@@ -196,13 +172,13 @@ namespace magic::details
     requires std::is_enum_v<T>
     struct Field
     {
-        constexpr static string_view name() { return name_of<static_cast<T>(N)>(); }
+        constexpr static std::string_view name() { return raw_name_of_enum<static_cast<T>(N)>(); }
 
         using type = T;
 
         constexpr static std::ptrdiff_t value() { return N; }
 
-        constexpr static string_view type_name() { return name_of<T>(); }
+        constexpr static std::string_view type_name() { return raw_name_of_enum<T>(); }
     };
 
     template <typename T>
@@ -220,7 +196,7 @@ namespace magic::details
         else
         {
             constexpr auto length = search_possible_bit_field_enum_length<T>();
-            constexpr auto has_zero = name_of<static_cast<T>(0)>() != "";
+            constexpr auto has_zero = raw_name_of_enum<static_cast<T>(0)>() != "";
             if constexpr (has_zero)
             {
                 f(Field<T, 0>{});
@@ -248,11 +224,11 @@ namespace magic
 
     template <typename T>
     requires std::is_enum_v<T>
-    constexpr auto& name_of(T value)
+    constexpr auto& raw_name_of_enum(T value)
     {
         constexpr auto start = enum_start<T>();
         return details::enum_names_storage<T>::names[static_cast<std::size_t>(value + start)];
     }
 } // namespace magic
-
+#endif
 #endif // MAGIC_CPP_ENUM_H

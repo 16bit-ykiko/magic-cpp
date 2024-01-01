@@ -21,8 +21,8 @@ def main():
     with open(path.join(src, "struct_bind_of_field_access.code"), "w") as f:
         f.write(generate_struct_bind_of_field_access(args.fields))
 
-    with open(path.join(src, "template_parse.code"), "w") as f:
-        f.write(generate_template_parse(args.templates))
+    with open(path.join(src, "template.code"), "w") as f:
+        f.write(generate_template_traits(args.templates))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,254 @@
+
+template<typename T>
+struct template_traits_1 : std::false_type {};
+    
+template <template<typename...> class U>
+constexpr auto template_full_name_1()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<typename...> class T, typename... Ts>
+struct template_traits_1<T<Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_1<T>();
+    using args_type = std::tuple<identity<Ts>...>;
+};
+    
+template <template<auto...> class U>
+constexpr auto template_full_name_1()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<auto...> class T, auto... Ts>
+struct template_traits_1<T<Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_1<T>();
+    using args_type = std::tuple<identity<decltype(Ts), Ts>...>;
+};
+    
+template<typename T>
+struct template_traits_2 : std::false_type {};
+    
+template <template<typename, auto...> class U>
+constexpr auto template_full_name_2()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<typename, auto...> class T, typename T1, auto... Ts>
+struct template_traits_2<T<T1, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_2<T>();
+    using args_type = std::tuple<identity<T1>, identity<decltype(Ts), Ts>...>;
+};
+    
+template <template<auto, typename...> class U>
+constexpr auto template_full_name_2()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<auto, typename...> class T, auto T1, typename... Ts>
+struct template_traits_2<T<T1, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_2<T>();
+    using args_type = std::tuple<identity<decltype(T1), T1>, identity<Ts>...>;
+};
+    
+template<typename T>
+struct template_traits_3 : std::false_type {};
+    
+template <template<typename, typename, auto...> class U>
+constexpr auto template_full_name_3()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<typename, typename, auto...> class T, typename T1, typename T2, auto... Ts>
+struct template_traits_3<T<T1, T2, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_3<T>();
+    using args_type = std::tuple<identity<T1>, identity<T2>, identity<decltype(Ts), Ts>...>;
+};
+    
+template <template<typename, auto, typename...> class U>
+constexpr auto template_full_name_3()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<typename, auto, typename...> class T, typename T1, auto T2, typename... Ts>
+struct template_traits_3<T<T1, T2, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_3<T>();
+    using args_type = std::tuple<identity<T1>, identity<decltype(T2), T2>, identity<Ts>...>;
+};
+    
+template <template<auto, typename, auto...> class U>
+constexpr auto template_full_name_3()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<auto, typename, auto...> class T, auto T1, typename T2, auto... Ts>
+struct template_traits_3<T<T1, T2, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_3<T>();
+    using args_type = std::tuple<identity<decltype(T1), T1>, identity<T2>, identity<decltype(Ts), Ts>...>;
+};
+    
+template <template<auto, auto, typename...> class U>
+constexpr auto template_full_name_3()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<auto, auto, typename...> class T, auto T1, auto T2, typename... Ts>
+struct template_traits_3<T<T1, T2, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_3<T>();
+    using args_type = std::tuple<identity<decltype(T1), T1>, identity<decltype(T2), T2>, identity<Ts>...>;
+};
+    
+template<typename T>
+struct template_traits_4 : std::false_type {};
+    
+template <template<typename, typename, typename, auto...> class U>
+constexpr auto template_full_name_4()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<typename, typename, typename, auto...> class T, typename T1, typename T2, typename T3, auto... Ts>
+struct template_traits_4<T<T1, T2, T3, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_4<T>();
+    using args_type = std::tuple<identity<T1>, identity<T2>, identity<T3>, identity<decltype(Ts), Ts>...>;
+};
+    
+template <template<typename, typename, auto, typename...> class U>
+constexpr auto template_full_name_4()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<typename, typename, auto, typename...> class T, typename T1, typename T2, auto T3, typename... Ts>
+struct template_traits_4<T<T1, T2, T3, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_4<T>();
+    using args_type = std::tuple<identity<T1>, identity<T2>, identity<decltype(T3), T3>, identity<Ts>...>;
+};
+    
+template <template<typename, auto, typename, auto...> class U>
+constexpr auto template_full_name_4()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<typename, auto, typename, auto...> class T, typename T1, auto T2, typename T3, auto... Ts>
+struct template_traits_4<T<T1, T2, T3, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_4<T>();
+    using args_type = std::tuple<identity<T1>, identity<decltype(T2), T2>, identity<T3>, identity<decltype(Ts), Ts>...>;
+};
+    
+template <template<typename, auto, auto, typename...> class U>
+constexpr auto template_full_name_4()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<typename, auto, auto, typename...> class T, typename T1, auto T2, auto T3, typename... Ts>
+struct template_traits_4<T<T1, T2, T3, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_4<T>();
+    using args_type = std::tuple<identity<T1>, identity<decltype(T2), T2>, identity<decltype(T3), T3>, identity<Ts>...>;
+};
+    
+template <template<auto, typename, typename, auto...> class U>
+constexpr auto template_full_name_4()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<auto, typename, typename, auto...> class T, auto T1, typename T2, typename T3, auto... Ts>
+struct template_traits_4<T<T1, T2, T3, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_4<T>();
+    using args_type = std::tuple<identity<decltype(T1), T1>, identity<T2>, identity<T3>, identity<decltype(Ts), Ts>...>;
+};
+    
+template <template<auto, typename, auto, typename...> class U>
+constexpr auto template_full_name_4()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<auto, typename, auto, typename...> class T, auto T1, typename T2, auto T3, typename... Ts>
+struct template_traits_4<T<T1, T2, T3, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_4<T>();
+    using args_type = std::tuple<identity<decltype(T1), T1>, identity<T2>, identity<decltype(T3), T3>, identity<Ts>...>;
+};
+    
+template <template<auto, auto, typename, auto...> class U>
+constexpr auto template_full_name_4()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<auto, auto, typename, auto...> class T, auto T1, auto T2, typename T3, auto... Ts>
+struct template_traits_4<T<T1, T2, T3, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_4<T>();
+    using args_type = std::tuple<identity<decltype(T1), T1>, identity<decltype(T2), T2>, identity<T3>, identity<decltype(Ts), Ts>...>;
+};
+    
+template <template<auto, auto, auto, typename...> class U>
+constexpr auto template_full_name_4()
+{
+    return MAGIC_CPP_FUNCTION_NAME;
+}
+template <template<auto, auto, auto, typename...> class T, auto T1, auto T2, auto T3, typename... Ts>
+struct template_traits_4<T<T1, T2, T3, Ts...>> : std::true_type 
+{
+    constexpr static auto full_name = template_full_name_4<T>();
+    using args_type = std::tuple<identity<decltype(T1), T1>, identity<decltype(T2), T2>, identity<decltype(T3), T3>, identity<Ts>...>;
+};
+    
+template<typename T>
+constexpr bool is_template()
+{
+    if constexpr(template_traits_1<T>::value)
+    {
+        return true;
+    }
+    else if constexpr(template_traits_2<T>::value)
+    {
+        return true;
+    }
+    else if constexpr(template_traits_3<T>::value)
+    {
+        return true;
+    }
+    else if constexpr(template_traits_4<T>::value)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+template<typename T>
+constexpr auto template_traits_impl() 
+{
+    if constexpr(template_traits_1<T>::value)
+    {
+        return template_traits_1<T>();
+    }
+    else if constexpr(template_traits_2<T>::value)
+    {
+        return template_traits_2<T>();
+    }
+    else if constexpr(template_traits_3<T>::value)
+    {
+        return template_traits_3<T>();
+    }
+    else if constexpr(template_traits_4<T>::value)
+    {
+        return template_traits_4<T>();
+    }
+    else
+    {
+        static_assert(is_template<T>(), "not supported");
+    }
+}

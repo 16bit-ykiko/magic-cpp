@@ -1,23 +1,15 @@
 from itertools import product
 
 
-def generate_all_combination(n: int):
-    # generate all combination of 0 and 1, and remove the if the last two elements are the same
-    # e.g. n = 2, all_combination = [(0, 1), (1, 0)]
-    # e.g. n = 3, all_combination = [(0, 1), (1, 0), (0, 0, 1), (0, 1, 0), (1, 0, 1), (1, 1, 0)]
-
-    all_combination = [(0,), (1,)]
-    for num in range(1, n + 1):
-        temp = list(product([0, 1], repeat=num))[1:-1]
-        for element in temp:
-            if (element[-1] != element[-2]):
-                all_combination.append(element)
-    return all_combination
-
-
-def generate_template_parse(n: int):
-    all_combination = generate_all_combination(n)
-    text = ""
+def generate_template_traits_n(n: int):
+    all_combination = []
+    for combination in product([0, 1], repeat=n):
+        if (len(combination) == 1) or (combination[-1] != combination[-2]):
+            all_combination.append(combination)
+    code = f"""
+template<typename T>
+struct template_traits_{n} : std::false_type {{}};
+    """
 
     for combination in all_combination:
 
@@ -34,9 +26,9 @@ def generate_template_parse(n: int):
         template_template_params += "typename..." if combination[-1] == 0 else "auto..."
 
         # generate template parameter
-        # e.g. combination = (0, 1), "typename T1, auto... T2"
-        # e.g. combination = (1, 0), "auto T1, typename... T2"
-        # e.g. combination = (0, 0, 1), "typename T1, typename T2, auto... T3"
+        # e.g. combination = (0, 1), "typename T1, auto... Ts"
+        # e.g. combination = (1, 0), "auto T1, typename... Ts"
+        # e.g. combination = (0, 0, 1), "typename T1, typename T2, auto... Ts"
         template_params = ""
         for index, element in list(enumerate(combination, start=1))[:-1]:
             if element == 0:
@@ -44,10 +36,6 @@ def generate_template_parse(n: int):
             else:
                 template_params += f"auto T{index}, "
         template_params += "typename... Ts" if combination[-1] == 0 else "auto... Ts"
-
-        # generate requires to avoid ambiguous
-        requires = "requires (sizeof...(Ts) > 0)" if len(
-            combination) > 1 else ""
 
         # generate specialization parameter
         # e.g. combination = (0, 1), "T1, Ts..."
@@ -58,35 +46,82 @@ def generate_template_parse(n: int):
             specialization_params_code += f"T{index}, "
         specialization_params_code += "Ts..."
 
-        # generate parse code
-        # e.g. combination = (0, 1)
-        # MAGIC_ADD_TYPE(T1)
-        # MAGIC_ADD_VARADIC_NTTPS(Ts)
-        #
-        # e.g. combination = (1, 1, 0)
-        # MAGIC_ADD_NTTP(T1)
-        # MAGIC_ADD_NTTP(T2)
-        # MAGIC_ADD_VARADIC_TYPES(Ts)
+        # generate args parameter
+        # e.g. combination = (0, 1), "identity<T1>, identity<decltype<Ts>, Ts>..."
+        # e.g. combination = (1, 0), "identity<decltype<T1>, T1>, identity<Ts>..."
+        # e.g. combination = (0, 0, 1), "identity<T1>, identity<T2>, identity<decltype<Ts>, Ts>..."
 
-        parse_code = ""
+        args_code = ""
         for index, element in list(enumerate(combination, start=1))[:-1]:
             if element == 0:
-                parse_code += f"    MAGIC_ADD_TYPE(T{index})\n"
+                args_code += f"identity<T{index}>, "
             else:
-                parse_code += f"    MAGIC_ADD_NTTP(T{index})\n"
+                args_code += f"identity<decltype(T{index}), T{index}>, "
         if combination[-1] == 0:
-            parse_code += f"    MAGIC_ADD_VARADIC_TYPES(Ts)"
+            args_code += f"identity<Ts>..."
         else:
-            parse_code += f"    MAGIC_ADD_VARADIC_NTTPS(Ts)"
+            args_code += f"identity<decltype(Ts), Ts>..."
 
-        text += f"""
-template <template <{template_template_params}> class T, {template_params}> {requires}
-struct type_traits<T<{specialization_params_code}>> 
+        code += f"""
+template <template<{template_template_params}> class U>
+constexpr auto template_full_name_{n}()
 {{
-    MAGIC_TEMPLATE_NAME
-    MAGIC_PARSE_START
-{parse_code}
-    MAGIC_PARSE_END
+    return MAGIC_CPP_FUNCTION_NAME;
+}}"""
+
+        code += f"""
+template <template<{template_template_params}> class T, {template_params}>
+struct template_traits_{n}<T<{specialization_params_code}>> : std::true_type 
+{{
+    constexpr static auto full_name = template_full_name_{n}<T>();
+    using args_type = std::tuple<{args_code}>;
 }};
+    """
+    return code
+
+
+def generate_template_traits(max: int):
+    result = ""
+    for i in range(1, max + 1):
+        result += generate_template_traits_n(i)
+
+    branchs = ""
+    for i in range(1, max + 1):
+        branchs += f"""
+    {"if"if i == 1 else "else if"} constexpr(template_traits_{i}<T>::value)
+    {{
+        return true;
+    }}"""
+
+    result += f"""
+template<typename T>
+constexpr bool is_template()
+{{{branchs}
+    else
+    {{
+        return false;
+    }}
+}}
 """
-    return text
+
+    branchs = ""
+    for i in range(1, max + 1):
+        branchs += f"""
+    {"if" if i == 1 else "else if"} constexpr(template_traits_{i}<T>::value)
+    {{
+        return template_traits_{i}<T>();
+    }}"""
+
+    result += f"""
+template<typename T>
+constexpr auto template_traits_impl() 
+{{{branchs}
+    else
+    {{
+        static_assert(is_template<T>(), "not supported");
+    }}
+}}
+"""
+
+    return result
+

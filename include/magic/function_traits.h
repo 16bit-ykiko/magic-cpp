@@ -1,346 +1,154 @@
-#ifndef MAGIC_CPP_FUNCTION_TRAITS_H
-#define MAGIC_CPP_FUNCTION_TRAITS_H
+#ifndef MAGIC_CPP_FUNCTION_TRAITS
+#define MAGIC_CPP_FUNCTION_TRAITS
+
+#include <tuple>
 
 namespace magic::details
 {
     template <typename T>
-    struct function_traits;
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...)>
+    struct function_traits
     {
-        constexpr static auto MODIFIER = "";
-        using type = R(Args...);
+        constexpr static bool is_const = false;
+        constexpr static bool is_volatile = false;
+        constexpr static bool is_lvalue_ref = false;
+        constexpr static bool is_rvalue_ref = false;
+        constexpr static bool is_noexcept = false;
+        constexpr static bool is_c_variadic = false;
     };
 
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) const>
-    {
-        constexpr static auto MODIFIER = "[const]";
-        using type = R(Args...);
+#define MAGIC_CPP_FUNCTION_TRAITS_IMPL(modifier, const, volatile, lref, rref, noexcept)                                                    \
+    template <typename R, typename... Args>                                                                                                \
+    struct function_traits<R(Args...) modifier>                                                                                            \
+    {                                                                                                                                      \
+        using return_type = R;                                                                                                             \
+        using args_type = std::tuple<Args...>;                                                                                             \
+        using primary_type = R(Args...);                                                                                                   \
+        constexpr static bool is_const = const;                                                                                            \
+        constexpr static bool is_volatile = volatile;                                                                                      \
+        constexpr static bool is_lvalue_ref = lref;                                                                                        \
+        constexpr static bool is_rvalue_ref = rref;                                                                                        \
+        constexpr static bool is_noexcept = noexcept;                                                                                      \
+        constexpr static bool is_c_variadic = false;                                                                                       \
     };
 
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) volatile>
-    {
-        constexpr static auto MODIFIER = "[volatile]";
-        using type = R(Args...);
+#define MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(modifier, const, volatile, lref, rref, noexcept)                                           \
+    template <typename R, typename... Args>                                                                                                \
+    struct function_traits<R(Args..., ...) modifier>                                                                                       \
+    {                                                                                                                                      \
+        using return_type = R;                                                                                                             \
+        using args_type = std::tuple<Args...>;                                                                                             \
+        using primary_type = R(Args...);                                                                                                   \
+        constexpr static bool is_const = const;                                                                                            \
+        constexpr static bool is_volatile = volatile;                                                                                      \
+        constexpr static bool is_lvalue_ref = lref;                                                                                        \
+        constexpr static bool is_rvalue_ref = rref;                                                                                        \
+        constexpr static bool is_noexcept = noexcept;                                                                                      \
+        constexpr static bool is_c_variadic = true;                                                                                        \
     };
 
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) const volatile>
-    {
-        constexpr static auto MODIFIER = "[const volatile]";
-        using type = R(Args...);
-    };
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(, false, false, false, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(const, true, false, false, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(volatile, false, true, false, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(const volatile, true, true, false, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(&, false, false, true, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(const&, true, false, true, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(volatile&, false, true, true, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(const volatile&, true, true, true, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(&&, false, false, false, true, false)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(const&&, true, false, false, true, false)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(volatile&&, false, true, false, true, false)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(const volatile&&, true, true, false, true, false)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(noexcept, false, false, false, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(const noexcept, true, false, false, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(volatile noexcept, false, true, false, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(const volatile noexcept, true, true, false, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(& noexcept, false, false, true, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(const& noexcept, true, false, true, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(volatile& noexcept, false, true, true, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(const volatile& noexcept, true, true, true, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(&& noexcept, false, false, false, true, true)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(const&& noexcept, true, false, false, true, true)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(volatile&& noexcept, false, true, false, true, true)
+    MAGIC_CPP_FUNCTION_TRAITS_IMPL(const volatile&& noexcept, true, true, false, true, true)
 
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...)&>
-    {
-        constexpr static auto MODIFIER = "[&]";
-        using type = R(Args...);
-    };
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(, false, false, false, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(const, true, false, false, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(volatile, false, true, false, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(const volatile, true, true, false, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(&, false, false, true, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(const&, true, false, true, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(volatile&, false, true, true, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(const volatile&, true, true, true, false, false)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(&&, false, false, false, true, false)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(const&&, true, false, false, true, false)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(volatile&&, false, true, false, true, false)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(const volatile&&, true, true, false, true, false)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(noexcept, false, false, false, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(const noexcept, true, false, false, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(volatile noexcept, false, true, false, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(const volatile noexcept, true, true, false, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(& noexcept, false, false, true, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(const& noexcept, true, false, true, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(volatile& noexcept, false, true, true, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(const volatile& noexcept, true, true, true, false, true)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(&& noexcept, false, false, false, true, true)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(const&& noexcept, true, false, false, true, true)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(volatile&& noexcept, false, true, false, true, true)
+    MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL(const volatile&& noexcept, true, true, false, true, true)
 
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) const&>
-    {
-        constexpr static auto MODIFIER = "[const &]";
-        using type = R(Args...);
-    };
+#undef MAGIC_CPP_FUNCTION_TRAITS_IMPL
+#undef MAGIC_CPP_FUNCTION_TRAITS_VARIADIC_IMPL
 
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) volatile&>
-    {
-        constexpr static auto MODIFIER = "[volatile &]";
-        using type = R(Args...);
-    };
+    template <typename T, typename U>
+    struct args_type_of_impl;
 
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) const volatile&>
+    template <typename T>
+    struct args_type_of_impl<T, std::enable_if_t<std::is_function_v<T>>>
     {
-        constexpr static auto MODIFIER = "[const volatile &]";
-        using type = R(Args...);
+        using type = typename function_traits<T>::args_type;
     };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) &&>
-    {
-        constexpr static auto MODIFIER = "[&&]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) const&&>
-    {
-        constexpr static auto MODIFIER = "[const &&]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) volatile&&>
-    {
-        constexpr static auto MODIFIER = "[volatile &&]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) const volatile&&>
-    {
-        constexpr static auto MODIFIER = "[const volatile &&]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) noexcept>
-    {
-        constexpr static auto MODIFIER = "[noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) const noexcept>
-    {
-        constexpr static auto MODIFIER = "[const noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) volatile noexcept>
-    {
-        constexpr static auto MODIFIER = "[volatile noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) const volatile noexcept>
-    {
-        constexpr static auto MODIFIER = "[const volatile noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) & noexcept>
-    {
-        constexpr static auto MODIFIER = "[& noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) const & noexcept>
-    {
-        constexpr static auto MODIFIER = "[const & noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) volatile & noexcept>
-    {
-        constexpr static auto MODIFIER = "[volatile & noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) const volatile & noexcept>
-    {
-        constexpr static auto MODIFIER = "[const volatile & noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) && noexcept>
-    {
-        constexpr static auto MODIFIER = "[&& noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) const && noexcept>
-    {
-        constexpr static auto MODIFIER = "[const && noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) volatile && noexcept>
-    {
-        constexpr static auto MODIFIER = "[volatile && noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args...) const volatile && noexcept>
-    {
-        constexpr static auto MODIFIER = "[const volatile && noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...)>
-    {
-        constexpr static auto MODIFIER = "[...]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) const>
-    {
-        constexpr static auto MODIFIER = "[...] [const]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) volatile>
-    {
-        constexpr static auto MODIFIER = "[...] [volatile]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) const volatile>
-    {
-        constexpr static auto MODIFIER = "[...] [const volatile]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...)&>
-    {
-        constexpr static auto MODIFIER = "[...] [&]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) const&>
-    {
-        constexpr static auto MODIFIER = "[...] [const &]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) volatile&>
-    {
-        constexpr static auto MODIFIER = "[...] [volatile &]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) const volatile&>
-    {
-        constexpr static auto MODIFIER = "[...] [const volatile &]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) &&>
-    {
-        constexpr static auto MODIFIER = "[...] [&&]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) const&&>
-    {
-        constexpr static auto MODIFIER = "[...] [const &&]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) volatile&&>
-    {
-        constexpr static auto MODIFIER = "[...] [volatile &&]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) const volatile&&>
-    {
-        constexpr static auto MODIFIER = "[...] [const volatile &&]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) noexcept>
-    {
-        constexpr static auto MODIFIER = "[...] [noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) const noexcept>
-    {
-        constexpr static auto MODIFIER = "[...] [const noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) volatile noexcept>
-    {
-        constexpr static auto MODIFIER = "[...] [volatile noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) const volatile noexcept>
-    {
-        constexpr static auto MODIFIER = "[...] [const volatile noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) & noexcept>
-    {
-        constexpr static auto MODIFIER = "[...] [& noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) const & noexcept>
-    {
-        constexpr static auto MODIFIER = "[...] [const & noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) volatile & noexcept>
-    {
-        constexpr static auto MODIFIER = "[...] [volatile & noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) const volatile & noexcept>
-    {
-        constexpr static auto MODIFIER = "[...] [const volatile & noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) && noexcept>
-    {
-        constexpr static auto MODIFIER = "[...] [&& noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) const && noexcept>
-    {
-        constexpr static auto MODIFIER = "[...] [const && noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) volatile && noexcept>
-    {
-        constexpr static auto MODIFIER = "[...] [volatile && noexcept]";
-        using type = R(Args...);
-    };
-
-    template <typename R, typename... Args>
-    struct function_traits<R(Args..., ...) const volatile && noexcept>
-    {
-        constexpr static auto MODIFIER = "[...] [const volatile && noexcept]";
-        using type = R(Args...);
-    };
-
 } // namespace magic::details
-#endif
+
+namespace magic
+{
+    template <typename T>
+    using return_type_of = typename details::function_traits<T>::return_type;
+
+    template <typename T>
+    using args_type_of = typename details::args_type_of_impl<T, void>::type;
+
+    template <typename T>
+    using first_arg_type_of = std::tuple_element_t<0, args_type_of<T>>;
+
+    template <typename T>
+    using second_arg_type_of = std::tuple_element_t<1, args_type_of<T>>;
+
+    template <typename T>
+    using third_arg_type_of = std::tuple_element_t<2, args_type_of<T>>;
+
+    template <typename T>
+    using primary_type_of = typename details::function_traits<T>::primary_type;
+
+    template <typename T>
+    constexpr static std::size_t fn_arity_v = std::tuple_size_v<args_type_of<T>>;
+
+    template <typename T>
+    constexpr static bool is_const_fn_v = details::function_traits<T>::is_const;
+
+    template <typename T>
+    constexpr static bool is_volatile_fn_v = details::function_traits<T>::is_volatile;
+
+    template <typename T>
+    constexpr static bool is_lvalue_ref_fn_v = details::function_traits<T>::is_lvalue_ref;
+
+    template <typename T>
+    constexpr static bool is_rvalue_ref_fn_v = details::function_traits<T>::is_rvalue_ref;
+
+    template <typename T>
+    constexpr static bool is_noexcept_fn_v = details::function_traits<T>::is_noexcept;
+
+    template <typename T>
+    constexpr static bool is_c_variadic_fn_v = details::function_traits<T>::is_c_variadic;
+} // namespace magic
+
+#endif // MAGIC_CPP_FUNCTION_TRAITS
