@@ -1,5 +1,8 @@
+![cover](docs/assets/cover.png)
+
 magic-cpp is a header-only C++ library. It aims to make it easier for you to use C++, including a series of functions such as visualizing type names, reflection of structs and enumerations, etc. It can help you get rid of the compiler's error messages which are difficult to read
 
+[English](README.md) | [简体中文](README.zh.md)
 
 - [Visualizing type](#visualizing-type)
   - [Basic usage](#basic-usage)
