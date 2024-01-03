@@ -33,6 +33,10 @@ target("test")
     set_default(false)
     add_files(os.files("test/*.cpp"))
 
+    if is_plat("windows") then
+        add_ldflags("/subsystem:console")
+    end
+
     add_deps("magic")
     add_packages("gtest")
 
