@@ -22,7 +22,6 @@ namespace magic
         return start == std::string_view::npos ? name : std::string_view{name.data() + start + 1, name.size() - start - 1};
 #else
         static_assert(false, "Unsupported compiler");
-
 #endif
     }
 
@@ -42,7 +41,6 @@ namespace magic
         return start == std::string_view::npos ? name : std::string_view{name.data() + start + 1, name.size() - start - 1};
 #else
         static_assert(false, "Unsupported compiler");
-
 #endif
     }
 
@@ -62,7 +60,6 @@ namespace magic
         return start == std::string_view::npos ? name : std::string_view{name.data() + start + 1, name.size() - start - 1};
 #else
         static_assert(false, "Unsupported compiler");
-
 #endif
     }
 

@@ -10,12 +10,12 @@
 
 namespace magic::details
 {
-    // clang-format off
+
     template <typename T>
     constexpr auto field_types_of_impl(T object)
     {
         constexpr auto N = field_count_of<T>();
-        #include "generate/struct_bind_of_field_types.code"
+#include "generate/struct_bind_of_field_types.code"
     }
 
     template <std::size_t Index>
@@ -23,10 +23,9 @@ namespace magic::details
     {
         using T = std::remove_cvref_t<decltype(object)>;
         constexpr auto N = field_count_of<T>();
-        #include "generate/struct_bind_of_field_access.code"
-      
+#include "generate/struct_bind_of_field_access.code"
     }
-    // clang-format on
+
 } // namespace magic::details
 
 namespace magic
@@ -82,9 +81,6 @@ namespace magic
         return field_names_of<T>()[Index];
     }
 
-    template <typename T>
-    constexpr std::string_view name_of();
-
     template <std::size_t N, typename T>
     struct Field
     {
@@ -98,7 +94,7 @@ namespace magic
 
         constexpr static std::string_view name() { return field_name_of<std::remove_cvref_t<T>>(N); }
 
-        constexpr static std::string_view type_name() { return name_of<type>(); }
+        constexpr static std::string_view type_name() { return raw_name_of<type>(); }
 
         constexpr static std::size_t index() { return N; }
 
@@ -108,6 +104,22 @@ namespace magic
 
         template <typename Object>
         friend constexpr void foreach (Object&& object, auto&& functor);
+    };
+
+    template <typename T>
+    concept FIELD = requires(T t) {
+        {
+            t.name()
+        } -> std::same_as<std::string_view>;
+        {
+            t.type_name()
+        } -> std::same_as<std::string_view>;
+        {
+            t.index()
+        } -> std::same_as<std::size_t>;
+        {
+            t.value()
+        };
     };
 
     template <typename Object>

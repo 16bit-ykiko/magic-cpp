@@ -14,9 +14,9 @@ namespace magic
 {
     struct VisualizeOption
     {
-        bool UTF8_SUPPORT = true;
-        bool COLORFUL_SUPPORT = true;
-        bool FULL_NAME = false;
+        bool utf_support = true;
+        bool color_support = true;
+        bool full_name = false;
     };
 
     struct HighlightConfig
@@ -124,13 +124,13 @@ namespace magic::details
         std::string result;
         HighlightConfig config;
         DirectoryTreeSymbols symbols;
-        bool colorful_support;
+        bool color_support;
 
       public:
         VisualizationImpl(const VisualizeOption& option, const HighlightConfig& config)
-            : result(), config(config), colorful_support(option.COLORFUL_SUPPORT)
+            : result(), config(config), color_support(option.color_support)
         {
-            if (option.UTF8_SUPPORT)
+            if (option.utf_support)
             {
                 symbols = {"├── ", "│   ", "└── ", "    "};
             }
@@ -143,7 +143,7 @@ namespace magic::details
         template <typename T>
         std::string colorize(T&& text, std::uint32_t color)
         {
-            if (!colorful_support)
+            if (!color_support)
             {
                 return std::forward<T>(text);
             }
@@ -291,7 +291,7 @@ namespace magic
     std::string visualize(const VisualizeOption& option, const HighlightConfig& config)
     {
         std::string result;
-        Type* type = details::parse<T>(option.FULL_NAME);
+        Type* type = details::parse<T>(option.full_name);
         details::VisualizationImpl visualizationImpl{option, config};
         visualizationImpl.visualize(type, "", "", true);
         delete type;

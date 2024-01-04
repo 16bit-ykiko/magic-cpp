@@ -56,9 +56,9 @@ It's the custom name, isn't it convenient? I have pre-defined some commonly used
 Considering that some terminals do not support color, or do not support `utf` characters, the display will appear garbled, so we provide options to turn off these functions
 ```cpp
 magic::VisualizeOption option;
-option.UTF8_SUPPORT = false;     // do not use utf8 characters
-option.COLORFUL_SUPPORT = false; // turn off color support
-option.FULL_NAME = true;        // use full name instead of custom alias
+option.utf_support = false;     // do not use utf8 characters
+option.color_support = false; // turn off color support
+option.full_name = true;        // use full name instead of custom alias
 std::cout << magic::visualize<std::string>(option) << std::endl;
 ```
 Output:

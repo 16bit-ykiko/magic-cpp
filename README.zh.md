@@ -55,9 +55,9 @@ struct magic::type_info<std::string>
 考虑到有的终端并不支持彩色，或者不支持`utf`字符，这样的话显示就出出现乱码，所以我们提供选项来关闭这些功能
 ```cpp
 magic::VisualizeOption option;
-option.UTF8_SUPPORT = false;     // 不使用utf8字符
-option.COLORFUL_SUPPORT = false; // 关闭彩色支持
-option.FULL_NAME = true;        // 使用全名而不是自定义的别名
+option.utf_support = false;     // 不使用utf8字符
+option.color_support = false; // 关闭彩色支持
+option.full_name = true;        // 使用全名而不是自定义的别名
 std::cout << magic::visualize<std::string>(option) << std::endl;
 ```
 

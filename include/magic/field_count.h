@@ -1,12 +1,13 @@
 #ifndef MAGIC_CPP_FIELD_COUNT_H
 #define MAGIC_CPP_FIELD_COUNT_H
 
+#define MAGIC_CPP_C_ARRAY_SUPPORT 1
+
 #include <array>
-
-#define MAGIC_CPP_C_ARRAY_SUPPORT 0
-
 namespace magic::details
 {
+    struct Any;
+
     struct Any
     {
         constexpr Any(int) {}
@@ -19,8 +20,12 @@ namespace magic::details
         requires std::is_move_constructible_v<T>
         operator T&&();
 
+        struct Empty
+        {
+        };
+
         template <typename T>
-        requires(!std::is_copy_constructible_v<T> && !std::is_move_constructible_v<T>)
+        requires(!std::is_copy_constructible_v<T> && !std::is_move_constructible_v<T> && !std::is_constructible_v<T, Empty>)
         operator T();
     };
 

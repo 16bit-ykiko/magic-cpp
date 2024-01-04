@@ -153,6 +153,46 @@ namespace magic::details
         virtual TypeKind Kind() const override { return TypeKind::FUNCTION; }
     };
 
+    struct never_functor
+    {
+    };
+
+    struct always_functor
+    {
+        void operator()();
+    };
+
+    template <typename T>
+    struct is_functor_impl : always_functor, std::conditional_t<std::is_class_v<T>, T, never_functor>
+    {
+    };
+
+    template <typename T, typename U = void>
+    struct is_functor : std::true_type
+    {
+    };
+
+    template <typename T>
+    struct is_functor<T, std::void_t<decltype(&is_functor_impl<T>::operator())>> : std::false_type
+    {
+    };
+
+    template <typename T>
+    constexpr bool is_functor_v = is_functor<T>::value;
+
+    template <typename T>
+    constexpr bool is_lambda()
+    {
+        if constexpr (is_functor_v<T>)
+        {
+            constexpr auto name = raw_name_of<T>();
+            return name.find("lambda") != std::string_view::npos;
+        }
+        else
+        {
+            return false;
+        }
+    }
     template <typename T>
     Type* parse(bool is_full_name);
 
@@ -160,7 +200,7 @@ namespace magic::details
     Type* parse_nttp(bool is_full_name)
     {
         NTTP* nttp = new NTTP{};
-        nttp->type = parse<decltype(Value)>(is_full_name);
+        nttp->type = parse<std::remove_cv_t<decltype(Value)>>(is_full_name);
         using Type = decltype(Value);
         if constexpr (std::is_enum_v<Type>)
         {
@@ -174,11 +214,24 @@ namespace magic::details
         {
             nttp->name = std::to_string(Value);
         }
+        else if constexpr (is_lambda<Type>())
+        {
+            nttp->name = "<lambda object>";
+        }
         else
         {
             nttp->name = raw_name_of<Value>();
         }
         return nttp;
+    }
+
+    inline std::size_t lambda_id = 0;
+
+    template <typename T>
+    std::string resolve_lambda()
+    {
+        static std::size_t id = lambda_id++;
+        return "<lambda{" + std::to_string(id) + "}>";
     }
 
     template <typename Tuple, std::size_t... Is>
@@ -309,7 +362,14 @@ namespace magic::details
         else
         {
             BasicType* basic_type = new BasicType{};
-            basic_type->name = raw_name_of<Primary>();
+            if constexpr (is_lambda<Primary>())
+            {
+                basic_type->name = resolve_lambda<Primary>();
+            }
+            else
+            {
+                basic_type->name = raw_name_of<Primary>();
+            }
             basic_type->is_const = is_const;
             basic_type->is_volatile = is_volatile;
             return basic_type;
