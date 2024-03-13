@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.22)
 project(magic-cpp)
 
+include_directories(include)
+
+option(MAGICCPP_INCLUDE_TESTS "Include tests" ON)
+if(NOT MAGICCPP_INCLUDE_TESTS)
+        return()
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -20,8 +27,6 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
-
-include_directories(include)
 
 # 使用通配符一次性添加多个测试文件
 file(GLOB TEST_SOURCES "test/*.cpp")
