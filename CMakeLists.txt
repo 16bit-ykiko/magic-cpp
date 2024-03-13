@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 3.22)
 project(magic-cpp)
 
-include_directories(include)
+add_library(MAGIC_CPP INTERFACE)
+target_include_directories(MAGIC_CPP INTERFACE include)
 
 option(MAGICCPP_INCLUDE_TESTS "Include tests" ON)
 if(NOT MAGICCPP_INCLUDE_TESTS)
         return()
 endif()
 
+include_directories(include)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
