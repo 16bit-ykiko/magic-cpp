@@ -77,7 +77,7 @@ struct HighlightConfig
     std::uint32_t tag;      // tag: R: , M: , ...
 };
 
-// 默认采用的配色方案是 Dark
+// default color scheme is Dark
 constexpr static inline HighlightConfig Dark = {
     .type = 0xE5C07B,     // yellow
     .nttp = 0xD19A66,     // orange
