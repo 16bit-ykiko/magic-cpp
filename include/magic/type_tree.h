@@ -5,6 +5,7 @@
 #include "type_traits.h"
 #include <string>
 #include <vector>
+#include <cstdint> // for std::uint*_t
 
 namespace magic
 {
@@ -124,7 +125,7 @@ namespace magic::details
     {
         Type* return_type;
         std::vector<Type*> parameters;
-        uint8_t flag;
+        std::uint8_t flag;
 
         virtual ~Function()
         {
