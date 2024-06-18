@@ -9,6 +9,7 @@
 #include "type_tree.h"
 #include <array>
 #include <cstring>
+#include <cstdint> // for std::uint*_t
 
 namespace magic
 {
@@ -147,9 +148,9 @@ namespace magic::details
             {
                 return std::forward<T>(text);
             }
-            uint8_t R = (color >> 16) & 0xFF;
-            uint8_t G = (color >> 8) & 0xFF;
-            uint8_t B = color & 0xFF;
+            std::uint8_t R = (color >> 16) & 0xFF;
+            std::uint8_t G = (color >> 8) & 0xFF;
+            std::uint8_t B = color & 0xFF;
             return format("\033[38;2;{};{};{}m{}\033[0m", R, G, B, std::forward<T>(text));
         }
 
