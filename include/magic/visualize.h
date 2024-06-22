@@ -1,6 +1,11 @@
 #ifndef MAGIC_CPP_VISUALIZE_H
 #define MAGIC_CPP_VISUALIZE_H
 
+#include <cstdio>
+#include <iterator>
+#include <numeric> // for std::accumulate
+#include <utility> // for std::pair
+#include <vector>  // for std::vector
 #if __has_include(<format>)
 #include <format>
 #endif
@@ -9,6 +14,7 @@
 #include "type_tree.h"
 #include <array>
 #include <cstring>
+
 #include <cstdint> // for std::uint*_t
 
 namespace magic
@@ -172,21 +178,49 @@ namespace magic::details
             std::string branch = format("{}{}{}", prefix, (is_last ? symbols.corner : symbols.branch), colorize(tag, config.tag));
             prefix += (is_last ? symbols.space : symbols.vertical);
 
+            auto build_boolean_modifiers = [](const std::vector<std::pair<bool, std::string_view>>& modifier_map)
+            {
+                std::vector<std::string_view> modifiers;
+
+                for (auto const& [pred, mod] : modifier_map)
+                {
+                    if (pred)
+                    {
+                        modifiers.push_back(mod);
+                    }
+                }
+
+                return std::accumulate(begin(modifiers),
+                                       end(modifiers),
+                                       std::string{},
+                                       [](const std::string& lhs, const std::string_view& rhs)
+                                       { return lhs.empty() ? std::string{rhs} : lhs + " " + std::string{rhs}; });
+            };
+            auto build_cxx_modifiers =
+                [&](bool is_const = false, bool is_volatile = false, bool is_lref = false, bool is_rref = false, bool is_noexcept = false)
+            {
+                return build_boolean_modifiers({
+                    {is_const,    "const"   },
+                    {is_volatile, "volatile"},
+                    {is_lref,     "&"       },
+                    {is_rref,     "&&"      },
+                    {is_noexcept, "noxcept" }
+                });
+            };
+
             for (std::size_t i = 0; i < tag.size(); i++) { prefix.push_back(' '); }
             if (type->Kind() == TypeKind::BASIC)
             {
                 BasicType* basic = static_cast<BasicType*>(type);
                 std::string name = colorize(std::move(basic->name), config.type);
-                std::string modifier = basic->is_const ? "const" : "";
-                modifier += basic->is_volatile ? (modifier.empty() ? "volatile" : " volatile") : "";
+                std::string modifier = build_cxx_modifiers(basic->is_const, basic->is_volatile);
                 visualize(std::move(branch), std::move(name), std::move(modifier));
             }
             else if (type->Kind() == TypeKind::POINTER)
             {
                 Pointer* pointer = static_cast<Pointer*>(type);
                 std::string name = colorize("ptr", config.builtin);
-                std::string modifier = pointer->is_const ? "const" : "";
-                modifier += pointer->is_volatile ? (modifier.empty() ? "volatile" : " volatile") : "";
+                std::string modifier = build_cxx_modifiers(pointer->is_const, pointer->is_volatile);
                 visualize(std::move(branch), std::move(name), std::move(modifier));
                 visualize(pointer->pointee, prefix, "", true);
             }
@@ -194,7 +228,7 @@ namespace magic::details
             {
                 Reference* ref = static_cast<Reference*>(type);
                 std::string name = colorize("ref", config.builtin);
-                std::string modifier = colorize(ref->is_lvalue_ref ? "&" : "&&", config.modifier);
+                std::string modifier = build_cxx_modifiers(false, false, ref->is_lvalue_ref, !ref->is_lvalue_ref);
                 visualize(std::move(branch), std::move(name), std::move(modifier));
                 visualize(ref->referencee, prefix, "", true);
             }
@@ -202,19 +236,22 @@ namespace magic::details
             {
                 Array* array = static_cast<Array*>(type);
                 std::string name = colorize("array", config.builtin);
-                std::string modifier = colorize(format("N = {}", array->size), config.modifier);
-                result += format("{}{} [{}]\n", branch, std::move(name), std::move(modifier));
+                // non-boolean modifier
+                // need not to colorize it here, `visualize(branch, name, modifier)` will perform colorize
+                std::string modifier = format("N = {}", array->size);
+                visualize(std::move(branch), std::move(name), std::move(modifier));
                 visualize(array->element, prefix, "", true);
             }
             else if (type->Kind() == TypeKind::FUNCTION)
             {
                 Function* function = static_cast<Function*>(type);
                 std::string name = colorize("function", config.builtin);
-                std::string modifier = function->isConst() ? "const" : "";
-                modifier += function->isVolatile() ? (modifier.empty() ? "volatile" : " volatile") : "";
-                modifier += function->isLvalueRef() ? (modifier.empty() ? "&" : " &") : "";
-                modifier += function->isRvalueRef() ? (modifier.empty() ? "&&" : " &&") : "";
-                modifier += function->isNoexcept() ? (modifier.empty() ? "noexcept" : " noexcept") : "";
+                std::string modifier = build_cxx_modifiers(function->isConst(),
+                                                            function->isVolatile(),
+                                                            function->isLvalueRef(),
+                                                            function->isLvalueRef(),
+                                                            function->isNoexcept());
+
                 visualize(std::move(branch), std::move(name), std::move(modifier));
 
                 std::vector<Type*>& params = function->parameters;
@@ -242,8 +279,7 @@ namespace magic::details
             {
                 Member* member = static_cast<Member*>(type);
                 std::string name = colorize("member ptr", config.builtin);
-                std::string modifier = member->is_const ? "const" : "";
-                modifier += member->is_volatile ? (modifier.empty() ? "volatile" : " volatile") : "";
+                std::string modifier = build_cxx_modifiers(member->is_const, member->is_volatile);
                 visualize(std::move(branch), std::move(name), std::move(modifier));
                 visualize(member->class_type, prefix, "C: ", false);
                 visualize(member->member_type, prefix, "M: ", true);
@@ -252,10 +288,11 @@ namespace magic::details
             {
                 Template* template_ = static_cast<Template*>(type);
                 std::string name = colorize(std::move(template_->name), config.tmpl);
-                std::string modifier = "template";
-                modifier += template_->is_const ? " const" : "";
-                modifier += template_->is_volatile ? " volatile" : "";
-                modifier = colorize(std::move(modifier), config.modifier);
+                std::string modifier = build_boolean_modifiers({
+                    {true,                   "template"},
+                    {template_->is_const,    "const"   },
+                    {template_->is_volatile, "volatile"},
+                });
                 visualize(std::move(branch), std::move(name), std::move(modifier));
 
                 for (std::size_t index = 0; index < template_->parameters.size(); index++)
